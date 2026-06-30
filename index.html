@@ -2079,8 +2079,15 @@
 
     function renderChartRealtime() {
       const items = dataRingkasanRealtime || {};
-      const labels = Object.keys(items);
-      const values = Object.values(items);
+      let labels = Object.keys(items);
+
+      labels.sort(function(a, b) {
+        const waktuA = timestampTerbaruPerKategoriRealtime[a] || 0;
+        const waktuB = timestampTerbaruPerKategoriRealtime[b] || 0;
+        return waktuB - waktuA;
+      });
+
+      const values = labels.map(function(l) { return items[l]; });
       const total = values.reduce(function(a, b) { return a + b; }, 0);
 
       document.getElementById('judulChartRealtime').textContent = 'Kategori Laporan';
@@ -2358,6 +2365,8 @@
       return [latBaru, lngBaru];
     }
 
+    let timestampTerbaruPerKategoriRealtime = {};
+
     async function muatTitikPetaRealtime(jenisFilter) {
       if (!layerMarkerRealtime) return;
       layerMarkerRealtime.clearLayers();
@@ -2372,6 +2381,19 @@
 
         const penandaKoordinat = {};
         const kategoriTerlihat = {}; 
+
+        if (!jenisFilter) {
+          const timestampBaru = {};
+          json.data.forEach(function(row) {
+            const namaKategori = row['Jenis Kejadian'] || '-';
+            const waktu = parseTimestampRealtime_(row['Timestamp']);
+            if (!timestampBaru[namaKategori] || waktu > timestampBaru[namaKategori]) {
+              timestampBaru[namaKategori] = waktu;
+            }
+          });
+          timestampTerbaruPerKategoriRealtime = timestampBaru;
+          renderChartRealtime();
+        }
 
         let jumlahTitik = 0;
         json.data.forEach(function(row) {
@@ -2445,12 +2467,31 @@
         const resp = await fetch(API_BASE_URL + '?' + params.toString());
         const json = await resp.json();
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat detail');
-        dataTabelRealtimeMentah = json.data;
+        dataTabelRealtimeMentah = json.data.slice().sort(function(a, b) {
+          return parseTimestampRealtime_(b['Timestamp']) - parseTimestampRealtime_(a['Timestamp']);
+        });
         isiOpsiUnitRealtime(dataTabelRealtimeMentah);
         renderTabelRealtime();
       } catch (err) {
         tbody.innerHTML = '<tr><td colspan="4"><div class="table-empty">Gagal memuat: ' + escapeHtml(err.message) + '</div></td></tr>';
       }
+    }
+
+    function parseTimestampRealtime_(nilai) {
+      if (!nilai) return 0;
+      const teks = String(nilai).trim();
+      const match = teks.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);
+      if (match) {
+        const tanggal = parseInt(match[1], 10);
+        const bulan = parseInt(match[2], 10) - 1;
+        const tahun = parseInt(match[3], 10);
+        const jam = parseInt(match[4], 10);
+        const menit = parseInt(match[5], 10);
+        const detik = parseInt(match[6], 10);
+        return new Date(tahun, bulan, tanggal, jam, menit, detik).getTime();
+      }
+      const fallback = new Date(teks).getTime();
+      return isNaN(fallback) ? 0 : fallback;
     }
 
     function isiOpsiUnitRealtime(rows) {

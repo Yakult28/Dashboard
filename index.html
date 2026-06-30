@@ -23,7 +23,7 @@
     --accent-warn: #E8A87C;
     --shadow: rgba(45, 52, 54, 0.08);
     --radius: 16px;
-
+    
     --fs-caption2: 11px;
     --fs-caption1: 12px;
     --fs-footnote: 13px;
@@ -172,13 +172,13 @@
   .landing-motif-wrap.kanan-bawah {
     bottom: 0;
     right: 0;
-
+    
     transform: scale(-1);
   }
 
   .landing-motif {
     display: block;
-    width: 880px;
+    width: 880px; 
     height: 360px; 
     object-fit: cover;
     object-position: top left;
@@ -549,6 +549,12 @@
     .header-text-eyebrow { display: none; }
     .landing { padding: 32px 16px; justify-content: flex-start; padding-top: 56px; }
     .landing-title { font-size: var(--fs-title1); margin-bottom: 28px; }
+
+    .panel-chart-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
   }
 
   .breadcrumb {
@@ -575,7 +581,6 @@
 
   .badge-bidang-realtime svg { width: 14px; height: 14px; }
 
-  /* ============ HALAMAN ANTARA: PILIH BIDANG REALTIME ============ */
   .judul-antara-realtime {
     font-size: var(--fs-title3);
     font-weight: 700;
@@ -1087,7 +1092,7 @@
       <img class="header-mark" src="logo-oikn.png" alt="Logo Otorita Ibu Kota Nusantara">
       <div>
         <div class="header-text-eyebrow">Otorita Ibu Kota Nusantara</div>
-        <div class="header-text-title">Laporan Kegiatan Dit. Trantibum</div>
+        <div class="header-text-title">Dashboard Kegiatan Dit. Trantibum</div>
       </div>
     </div>
     <div class="theme-toggle" role="group" aria-label="Pilihan tampilan">
@@ -1354,7 +1359,6 @@
     </div>
   </section>
 
-  <!-- ============ VIEW: REKAPAN SURAT TEGURAN ============ -->
   <section class="view" id="viewSurat">
     <button class="view-back" data-target="landingView">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -1436,6 +1440,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    
     const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbw8e8WzUtG0ViMsMauuqhTF_SUQq5tdRJ5Zz0lwFOwUzfBHCxKcNdjaEb6Q1ASXa_EC/exec';
 
     const PALET_CHART = ['#8FB9A8', '#A8C5D6', '#E8A87C', '#C9A8D6', '#D6C9A8', '#A8D6C0', '#D6A8AC', '#A8B5D6'];
@@ -1473,7 +1478,6 @@
     const PUSAT_PETA_IKN = [-0.9889, 116.7398];
     const ZOOM_AWAL_PETA = 12;
 
-
     const landingView = document.getElementById('landingView');
     const viewPelaporan = document.getElementById('viewPelaporan');
     const viewRealtime = document.getElementById('viewRealtime');
@@ -1506,6 +1510,7 @@
     });
     document.querySelectorAll('.view-back').forEach(function(btn) {
       btn.addEventListener('click', function() {
+        
         if (this.id === 'btnBackRealtime') {
           const detailSedangTampil = document.getElementById('realtimeDetailWrap').style.display !== 'none';
           if (detailSedangTampil) {
@@ -1519,20 +1524,20 @@
 
     document.querySelectorAll('.sub-card').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
-        e.stopPropagation(); // jangan ikut memicu klik kartu utama di belakangnya
+        e.stopPropagation(); 
         const targetView = this.dataset.targetView;
         const mode = this.dataset.subMode;
         const unit = this.dataset.subUnit;
-        const aktif = this.dataset.subAktif !== 'false'; // default aktif untuk Pelaporan (tidak diberi atribut ini)
+        const aktif = this.dataset.subAktif !== 'false'; 
 
         showView(targetView);
 
         if (mode === 'pelaporan') {
-
+          
           muatDataPelaporan(unit);
-          sembunyikanBannerBelumTersedia_('Pelaporan'); // tidak relevan untuk Pelaporan, tapi aman dipanggil
+          sembunyikanBannerBelumTersedia_('Pelaporan'); 
         } else if (mode === 'realtime') {
-
+          
           document.getElementById('realtimeAntaraWrap').style.display = 'none';
           document.getElementById('realtimeDetailWrap').style.display = 'block';
           muatDataRealtime(unit);
@@ -1572,19 +1577,19 @@
       }
     }
 
-
     const headerHomeLink = document.getElementById('headerHomeLink');
     headerHomeLink.addEventListener('click', function() { showView('landingView'); });
     headerHomeLink.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showView('landingView'); }
     });
 
-    let dataRingkasanPelaporan = null; // hasil fetch ?fungsi=ringkasanPelaporan, disimpan di memori
-    let chartPelaporan = null;         // instance Chart.js aktif
+    let dataRingkasanPelaporan = null; 
+    let chartPelaporan = null;         
     let stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
-    let dataTabelPelaporanMentah = []; // hasil fetch detail, sebelum difilter teks bebas di client
+    let dataTabelPelaporanMentah = []; 
 
     async function muatDataPelaporan(sumberAwal) {
+      
       if (dataRingkasanPelaporan) {
         if (sumberAwal) {
           stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
@@ -1602,7 +1607,7 @@
         dataRingkasanPelaporan = json.data;
         stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
         if (sumberAwal) {
-
+          
           klikItemPelaporan(sumberAwal);
         } else {
           renderChartPelaporan();
@@ -1622,7 +1627,6 @@
       const d = dataRingkasanPelaporan;
       if (!d) return { label: '', items: {}, level: 0 };
 
-      // LEVEL 1: semua sumber
       const itemsLevel1 = {};
       Object.keys(d).forEach(function(sumber) { itemsLevel1[sumber] = d[sumber].total; });
 
@@ -1653,7 +1657,7 @@
 
     function renderChartPelaporan() {
       const dataLevelMentah = ambilDataLevelAktifPelaporan();
-
+      
       const itemsTersaring = {};
       Object.keys(dataLevelMentah.items).forEach(function(key) {
         if (key !== '-') itemsTersaring[key] = dataLevelMentah.items[key];
@@ -1759,7 +1763,7 @@
       } else if (!stateDrillPelaporan.subKategori) {
         stateDrillPelaporan.subKategori = label;
         muatTabelDetailPelaporan();
-        return; // tabel akan merender ulang chart-nya sendiri setelah selesai
+        return; 
       }
       renderChartPelaporan();
     }
@@ -1803,7 +1807,7 @@
     }
 
     async function muatTabelDetailPelaporan() {
-      renderChartPelaporan(); // perbarui breadcrumb & judul dulu
+      renderChartPelaporan(); 
 
       const panel = document.getElementById('panelDetailPelaporan');
       panel.style.display = 'block';
@@ -1978,13 +1982,13 @@
 
     document.getElementById('modalDetailClose').addEventListener('click', tutupModalDetail_);
     document.getElementById('modalDetailOverlay').addEventListener('click', function(e) {
-      if (e.target === this) tutupModalDetail_(); // klik area gelap di luar kotak modal -> tutup
+      if (e.target === this) tutupModalDetail_(); 
     });
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') tutupModalDetail_();
     });
 
-    let dataRingkasanRealtime = null; // hasil fetch ?fungsi=ringkasanRealtime
+    let dataRingkasanRealtime = null; 
     let chartRealtime = null;
     let mapRealtimeInstance = null;
     let layerMarkerRealtime = null;
@@ -2013,6 +2017,7 @@
       muatTitikPetaRealtimeGabungan();
       dataGabunganSudahDimuat = true;
     }
+
     async function muatRingkasanSingkatBidang_() {
       ['Pol PP', 'Polhut', 'Damkar'].forEach(async function(bidang) {
         const idTarget = 'ringkasanAntara' + bidang.replace(/\s+/g, '');
@@ -2038,8 +2043,8 @@
       });
     });
 
-
     async function muatDataRealtime(namaBidang) {
+      
       const bidangBerubah = namaBidang && namaBidang !== bidangRealtimeAktif;
       if (namaBidang) bidangRealtimeAktif = namaBidang;
 
@@ -2140,7 +2145,7 @@
       stateDrillRealtime.jenis = label;
       renderBreadcrumbRealtime();
       muatTabelDetailRealtime();
-
+      
     }
 
     function renderBreadcrumbRealtime() {
@@ -2172,14 +2177,14 @@
       stateDrillRealtime.jenis = null;
       renderBreadcrumbRealtime();
       document.getElementById('panelDetailRealtime').style.display = 'none';
-
+      
     }
 
     function inisialisasiPetaRealtime() {
       return new Promise(function(resolve) {
         try {
           if (mapRealtimeInstance) {
-            // Peta sudah pernah dibuat -- pastikan ukurannya menyesuaikan ulang
+            
             setTimeout(function() {
               mapRealtimeInstance.invalidateSize();
               resolve();
@@ -2206,7 +2211,7 @@
             }, 150);
           });
         } catch (err) {
-
+          
           console.error('Gagal inisialisasi peta:', err.message);
           resolve();
         }
@@ -2249,10 +2254,6 @@
       });
     }
 
-    // Memetakan kategori ke warna, mencari di SELURUH 3 daftar kategori
-    // bidang (bukan hanya 1 bidang) -- dipakai khusus peta gabungan, karena
-    // warna marker tetap dibedakan per KATEGORI meski sumbernya tercampur
-    // dari Pol PP/Polhut/Damkar (sesuai keputusan yang sudah dikonfirmasi).
     function ambilWarnaKategoriGabungan_(namaKategori) {
       const seluruhKategori = []
         .concat(KONFIGURASI_BIDANG_REALTIME_FE['Pol PP'].daftarJenis)
@@ -2286,7 +2287,6 @@
           penandaKoordinat[kunciKoordinat] = indeksDuplikat + 1;
 
           const posisiTampil = tambahkanOffsetAcakKoordinat_(lat, lng, indeksDuplikat);
-
 
           const jenisMentah = String(row['Jenis Kejadian'] || '-');
           const namaKategori = jenisMentah.split(',')[0].trim() || '-';
@@ -2338,26 +2338,19 @@
       }).join('');
     }
 
-    // Memetakan nama kategori (Jenis Kejadian) ke warna BOLD untuk marker
-    // peta -- index-nya tetap konsisten dengan urutan warna pastel pada
-    // donut chart (PALET_CHART), hanya nuansanya yang lebih tegas/jenuh
-    // supaya titik mudah terlihat kontras di atas latar peta. Dipakai
-    // khusus halaman DETAIL per bidang (bukan peta gabungan, yang
-    // memakai ambilWarnaKategoriGabungan_ di atas).
     function ambilWarnaKategoriRealtime_(namaKategori) {
       const daftarJenisBidangIni = KONFIGURASI_BIDANG_REALTIME_FE[bidangRealtimeAktif].daftarJenis;
       const indexKategori = daftarJenisBidangIni.indexOf(namaKategori);
-      if (indexKategori === -1) return '#546E7A'; // abu-abu gelap untuk kategori di luar daftar baku
+      if (indexKategori === -1) return '#546E7A'; 
       return PALET_PETA_BOLD[indexKategori % PALET_PETA_BOLD.length];
     }
 
-
     function tambahkanOffsetAcakKoordinat_(lat, lng, indeksDuplikat) {
-      if (indeksDuplikat === 0) return [lat, lng]; // titik pertama di lokasi itu, tidak digeser
-      const radiusOffset = 0.0006; // kira-kira 50-60 meter pada garis lintang IKN
-      const sudut = (indeksDuplikat * 137.5) % 360; // sudut emas, supaya titik menyebar rapi melingkar
+      if (indeksDuplikat === 0) return [lat, lng]; 
+      const radiusOffset = 0.0006; 
+      const sudut = (indeksDuplikat * 137.5) % 360; 
       const radian = sudut * Math.PI / 180;
-
+      
       const latBaru = Math.round((lat + radiusOffset * Math.cos(radian)) * 1e7) / 1e7;
       const lngBaru = Math.round((lng + radiusOffset * Math.sin(radian)) * 1e7) / 1e7;
       return [latBaru, lngBaru];
@@ -2375,11 +2368,8 @@
         const json = await resp.json();
         if (json.status !== 'success') throw new Error(json.message);
 
-        // Hitung berapa kali koordinat yang sama sudah muncul sebelumnya,
-        // untuk menentukan besar/arah offset agar titik identik tidak
-        // saling menutupi sempurna di peta.
         const penandaKoordinat = {};
-        const kategoriTerlihat = {}; // untuk mengisi legenda, hanya kategori yang benar-benar ada titiknya
+        const kategoriTerlihat = {}; 
 
         let jumlahTitik = 0;
         json.data.forEach(function(row) {
@@ -2441,7 +2431,6 @@
       }).join('');
     }
 
-    // ============ PANEL DETAIL: TABEL + FILTER (REALTIME) ============
     async function muatTabelDetailRealtime() {
       const panel = document.getElementById('panelDetailRealtime');
       panel.style.display = 'block';
@@ -2510,7 +2499,6 @@
     document.getElementById('filterTeksRealtime').addEventListener('input', renderTabelRealtime);
     document.getElementById('filterUnitRealtime').addEventListener('change', renderTabelRealtime);
 
-
     let dataRingkasanSurat = null;
     let chartSurat = null;
     let stateDrillSurat = { sumber: null, kategori: null };
@@ -2546,8 +2534,6 @@
         return { label: 'Jenis Surat', items: itemsLevel1, level: 1 };
       }
 
-      // LEVEL 2: kategori (10 klasifikasi pelanggaran) dalam 1 jenis surat,
-      // hanya tampilkan yang jumlahnya > 0 agar legenda tidak terlalu panjang
       const kategoriSemua = d[stateDrillSurat.sumber].kategori;
       const kategoriAdaIsi = {};
       Object.keys(kategoriSemua).forEach(function(k) {
@@ -2610,7 +2596,6 @@
       if (!stateDrillSurat.kategori) {
         document.getElementById('panelDetailSurat').style.display = 'none';
       }
-
 
       const panelTrenSurat = document.getElementById('panelTrenSurat');
       panelTrenSurat.classList.toggle('tersembunyi', !!stateDrillSurat.sumber);
@@ -2764,7 +2749,6 @@
 
     document.getElementById('filterTeksSurat').addEventListener('input', renderTabelSurat);
     document.getElementById('filterBulanSurat').addEventListener('change', renderTabelSurat);
-
 
     let chartTrenSurat = null;
 

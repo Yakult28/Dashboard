@@ -729,7 +729,7 @@
 
   @media (max-width: 860px) {
     .chart-body { flex-direction: column; }
-    .chart-canvas-wrap { width: 280px; height: 280px; }
+    .chart-canvas-wrap { width: 280px; height: 280px; max-width: 100%; aspect-ratio: 1 / 1; }
   }
 
   .chart-canvas-wrap {
@@ -979,7 +979,9 @@
 
   @media (max-width: 860px) {
     .side-by-side { grid-template-columns: 1fr; }
-    .side-by-side .panel-chart, .side-by-side .panel-peta { height: auto; }
+    .side-by-side .panel-chart, .side-by-side .panel-peta { height: auto; max-height: none; }
+    .side-by-side .panel-chart .chart-body { overflow-y: visible; flex: none; }
+    .chart-canvas-wrap { margin: 0 auto; }
   }
 
   .side-by-side .panel-chart,

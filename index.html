@@ -71,7 +71,6 @@
 
   button { font-family: inherit; -webkit-appearance: none; }
 
-
   .app-header {
     display: flex;
     align-items: center;
@@ -117,7 +116,6 @@
     text-overflow: ellipsis;
   }
 
-
   .theme-toggle {
     display: flex;
     align-items: center;
@@ -150,7 +148,6 @@
 
   .theme-toggle svg { width: 16px; height: 16px; }
 
-
   .landing {
     flex: 1;
     display: flex;
@@ -160,9 +157,7 @@
     padding: 40px 20px;
     text-align: center;
     position: relative;
-    overflow: hidden;
   }
-
 
   .landing-motif-wrap {
     position: fixed;
@@ -183,7 +178,7 @@
 
   .landing-motif {
     display: block;
-    width: 880px; 
+    width: 880px;
     height: 360px; 
     object-fit: cover;
     object-position: top left;
@@ -192,12 +187,10 @@
     left: 0;
   }
 
-
   @media (max-width: 900px) {
     .landing-motif-wrap { width: 150px; height: 62px; }
     .landing-motif { width: 600px; height: 248px; }
   }
-
 
   @media (max-width: 540px) {
     .landing-motif-wrap { width: 100px; height: 42px; }
@@ -205,8 +198,8 @@
   }
 
   .landing-logo {
-    width: 96px;
-    height: 96px;
+    width: 210px;
+    height: 210px;
     object-fit: contain;
     margin-bottom: 20px;
     position: relative;
@@ -245,7 +238,6 @@
   .mode-card.surat .mode-card-eyebrow { color: #B5713F; }
   [data-theme="dark"] .mode-card.surat .mode-card-eyebrow { color: var(--accent-warn); }
   .mode-card.surat:hover { border-color: var(--accent-warn); }
-
 
   .mode-group {
     display: flex;
@@ -290,7 +282,6 @@
     display: block;
   }
 
-
   .banner-belum-tersedia {
     display: none;
     align-items: center;
@@ -317,7 +308,6 @@
   }
 
   .banner-belum-tersedia-text strong { font-weight: 700; }
-
 
   .modal-overlay {
     display: none;
@@ -509,7 +499,6 @@
     z-index: 1;
   }
 
-
   .view {
     display: none;
     flex: 1;
@@ -549,12 +538,10 @@
     padding: 24px;
   }
 
-
   @media (min-width: 768px) and (max-width: 1024px) {
     .app-header { padding: 14px 32px; }
     .landing { padding: 56px 32px; }
   }
-
 
   @media (max-width: 480px) {
     .app-header { padding: 10px 16px; }
@@ -563,7 +550,6 @@
     .landing { padding: 32px 16px; justify-content: flex-start; padding-top: 56px; }
     .landing-title { font-size: var(--fs-title1); margin-bottom: 28px; }
   }
-
 
   .breadcrumb {
     display: flex;
@@ -589,7 +575,7 @@
 
   .badge-bidang-realtime svg { width: 14px; height: 14px; }
 
-
+  /* ============ HALAMAN ANTARA: PILIH BIDANG REALTIME ============ */
   .judul-antara-realtime {
     font-size: var(--fs-title3);
     font-weight: 700;
@@ -658,7 +644,6 @@
     font-size: 13px;
   }
 
-
   .panel-chart {
     background: var(--bg-elevated);
     border: 1px solid var(--border);
@@ -672,7 +657,6 @@
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
 
   .panel-tren {
     background: var(--bg-elevated);
@@ -738,8 +722,9 @@
     align-items: center;
   }
 
-  @media (max-width: 680px) {
+  @media (max-width: 860px) {
     .chart-body { flex-direction: column; }
+    .chart-canvas-wrap { width: 280px; height: 280px; }
   }
 
   .chart-canvas-wrap {
@@ -832,7 +817,6 @@
     color: var(--text-tertiary);
     flex-shrink: 0;
   }
-
 
   .panel-detail {
     background: var(--bg-elevated);
@@ -980,7 +964,6 @@
 
   .btn-dokumen svg { width: 13px; height: 13px; }
 
-
   .side-by-side {
     display: grid;
     grid-template-columns: minmax(260px, 1fr) minmax(280px, 1.4fr);
@@ -1104,7 +1087,7 @@
       <img class="header-mark" src="logo-oikn.png" alt="Logo Otorita Ibu Kota Nusantara">
       <div>
         <div class="header-text-eyebrow">Otorita Ibu Kota Nusantara</div>
-        <div class="header-text-title">Dashboard Kegiatan Dit. Trantibum</div>
+        <div class="header-text-title">Laporan Kegiatan Dit. Trantibum</div>
       </div>
     </div>
     <div class="theme-toggle" role="group" aria-label="Pilihan tampilan">
@@ -1117,11 +1100,10 @@
     </div>
   </header>
 
-
   <main class="landing" id="landingView">
     <div class="landing-motif-wrap kanan-bawah"><img class="landing-motif" src="Batang_Banyu.png" alt="" aria-hidden="true"></div>
     <img class="landing-logo" src="logo-oikn.png" alt="Logo Otorita Ibu Kota Nusantara">
-    <h1 class="landing-title">Dashboard Dit. Trantibum</h1>
+    <h1 class="landing-title">Laporan Kegiatan Dit. Trantibum</h1>
 
     <div class="mode-cards">
       <div class="mode-group">
@@ -1208,7 +1190,6 @@
     <p class="footer-note">Data diperbarui otomatis setiap 1 jam &middot; Internal Direktorat Trantibum OIKN</p>
   </main>
 
-
   <section class="view" id="viewPelaporan">
     <button class="view-back" data-target="landingView">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -1271,14 +1252,12 @@
     </div>
   </section>
 
-
   <section class="view" id="viewRealtime">
     <button class="view-back" data-target="landingView" id="btnBackRealtime">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Kembali
     </button>
 
-    <!-- ============ HALAMAN ANTARA: PILIH BIDANG + PETA GABUNGAN ============ -->
     <div id="realtimeAntaraWrap">
       <div class="judul-antara-realtime">Pilih Bidang Laporan Real-time</div>
       <div class="side-by-side">
@@ -1309,7 +1288,6 @@
         </div>
       </div>
     </div>
-
 
     <div id="realtimeDetailWrap" style="display:none;">
       <div class="breadcrumb" id="breadcrumbRealtime"></div>
@@ -1376,7 +1354,7 @@
     </div>
   </section>
 
-
+  <!-- ============ VIEW: REKAPAN SURAT TEGURAN ============ -->
   <section class="view" id="viewSurat">
     <button class="view-back" data-target="landingView">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -1443,7 +1421,6 @@
     </div>
   </section>
 
-
   <div class="modal-overlay" id="modalDetailOverlay">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalDetailTitle">
       <div class="modal-head">
@@ -1459,15 +1436,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // ============ KONFIGURASI API ============
     const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbw8e8WzUtG0ViMsMauuqhTF_SUQq5tdRJ5Zz0lwFOwUzfBHCxKcNdjaEb6Q1ASXa_EC/exec';
 
-    // Palet warna pastel untuk chart, konsisten dengan tema dashboard
     const PALET_CHART = ['#8FB9A8', '#A8C5D6', '#E8A87C', '#C9A8D6', '#D6C9A8', '#A8D6C0', '#D6A8AC', '#A8B5D6'];
 
-
     const PALET_PETA_BOLD = ['#1F8A5F', '#1565C0', '#E65100', '#8E24AA', '#8D6E10', '#00897B', '#C2185B', '#3949AB'];
-
 
     const KONFIGURASI_BIDANG_REALTIME_FE = {
       'Pol PP': {
@@ -1495,9 +1468,7 @@
       }
     };
 
-
     let bidangRealtimeAktif = 'Pol PP';
-
 
     const PUSAT_PETA_IKN = [-0.9889, 116.7398];
     const ZOOM_AWAL_PETA = 12;
@@ -1535,7 +1506,6 @@
     });
     document.querySelectorAll('.view-back').forEach(function(btn) {
       btn.addEventListener('click', function() {
-
         if (this.id === 'btnBackRealtime') {
           const detailSedangTampil = document.getElementById('realtimeDetailWrap').style.display !== 'none';
           if (detailSedangTampil) {
@@ -1546,7 +1516,6 @@
         showView(this.dataset.target);
       });
     });
-
 
     document.querySelectorAll('.sub-card').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
@@ -1559,13 +1528,11 @@
         showView(targetView);
 
         if (mode === 'pelaporan') {
-          // Pelaporan selalu punya data nyata untuk Pol PP/Polhut/Damkar
-          // (1:1 dengan sumber Sheet Master) -- langsung skip ke drill-down.
+
           muatDataPelaporan(unit);
           sembunyikanBannerBelumTersedia_('Pelaporan'); // tidak relevan untuk Pelaporan, tapi aman dipanggil
         } else if (mode === 'realtime') {
-          // Ketiga bidang (Pol PP/Polhut/Damkar) sekarang sama-sama aktif --
-          // sub-kartu landing SKIP halaman antara, langsung ke detail.
+
           document.getElementById('realtimeAntaraWrap').style.display = 'none';
           document.getElementById('realtimeDetailWrap').style.display = 'block';
           muatDataRealtime(unit);
@@ -1587,7 +1554,6 @@
       labelUnit.textContent = namaUnit;
       banner.classList.add('tampil');
 
-
       if (mode === 'Surat') {
         document.querySelector('#viewSurat .panel-chart').style.display = 'none';
         document.getElementById('panelTrenSurat').style.display = 'none';
@@ -1606,13 +1572,12 @@
       }
     }
 
-    // Klik logo/judul di header -> kembali ke halaman utama (landing)
+
     const headerHomeLink = document.getElementById('headerHomeLink');
     headerHomeLink.addEventListener('click', function() { showView('landingView'); });
     headerHomeLink.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showView('landingView'); }
     });
-
 
     let dataRingkasanPelaporan = null; // hasil fetch ?fungsi=ringkasanPelaporan, disimpan di memori
     let chartPelaporan = null;         // instance Chart.js aktif
@@ -1620,7 +1585,6 @@
     let dataTabelPelaporanMentah = []; // hasil fetch detail, sebelum difilter teks bebas di client
 
     async function muatDataPelaporan(sumberAwal) {
-      // Jika sudah pernah dimuat sebelumnya dalam sesi ini, tidak perlu fetch ulang
       if (dataRingkasanPelaporan) {
         if (sumberAwal) {
           stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
@@ -1638,8 +1602,7 @@
         dataRingkasanPelaporan = json.data;
         stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
         if (sumberAwal) {
-          // Diakses dari sub-kartu unit (Pol PP/Polhut/Damkar) -- skip Level 1,
-          // langsung tampilkan drill-down sumber yang dipilih
+
           klikItemPelaporan(sumberAwal);
         } else {
           renderChartPelaporan();
@@ -1655,7 +1618,6 @@
       if (judulEl) judulEl.textContent = 'Memuat data\u2026';
     }
 
-
     function ambilDataLevelAktifPelaporan() {
       const d = dataRingkasanPelaporan;
       if (!d) return { label: '', items: {}, level: 0 };
@@ -1668,7 +1630,6 @@
         return { label: 'Sumber Laporan', items: itemsLevel1, level: 1 };
       }
 
-      // LEVEL 2: kategori dalam 1 sumber
       const sumberData = d[stateDrillPelaporan.sumber];
       const itemsLevel2 = {};
       Object.keys(sumberData.kategori).forEach(function(kat) {
@@ -1678,7 +1639,6 @@
       if (!stateDrillPelaporan.kategori) {
         return { label: stateDrillPelaporan.sumber, items: itemsLevel2, level: 2 };
       }
-
 
       const subData = sumberData.kategori[stateDrillPelaporan.kategori].subKategori;
       if (hanyaBerisiStrip_(subData)) {
@@ -1754,11 +1714,9 @@
 
       renderLegendPelaporan(labels, values, total, level);
 
-
       if (!stateDrillPelaporan.subKategori) {
         document.getElementById('panelDetailPelaporan').style.display = 'none';
       }
-
 
       const panelTren = document.getElementById('panelTrenPelaporan');
       panelTren.classList.toggle('tersembunyi', !!stateDrillPelaporan.sumber);
@@ -1780,7 +1738,6 @@
       });
     }
 
-
     function hanyaBerisiStrip_(items) {
       const keys = Object.keys(items);
       return keys.length === 0 || (keys.length === 1 && keys[0] === '-');
@@ -1791,7 +1748,6 @@
         stateDrillPelaporan.sumber = label;
       } else if (!stateDrillPelaporan.kategori) {
         stateDrillPelaporan.kategori = label;
-
 
         const subData = dataRingkasanPelaporan[stateDrillPelaporan.sumber]
           .kategori[label].subKategori;
@@ -1845,7 +1801,6 @@
       }
       renderChartPelaporan();
     }
-
 
     async function muatTabelDetailPelaporan() {
       renderChartPelaporan(); // perbarui breadcrumb & judul dulu
@@ -1927,7 +1882,6 @@
     document.getElementById('filterTeksPelaporan').addEventListener('input', renderTabelPelaporan);
     document.getElementById('filterBulanPelaporan').addEventListener('change', renderTabelPelaporan);
 
-
     let chartTrenPelaporan = null;
 
     async function muatTrenBulananPelaporan() {
@@ -1942,7 +1896,6 @@
         console.error('Gagal memuat tren bulanan Pelaporan:', err.message);
       }
     }
-
 
     function renderStackedBarChart_(canvasId, instanceLama, bulanUrut, daftarKategori, dataBersarang) {
       if (typeof Chart === 'undefined') return null;
@@ -1983,7 +1936,6 @@
       });
     }
 
-    // ============ FUNGSI BANTU ============
     function escapeHtml(teks) {
       if (teks === null || teks === undefined) return '';
       return String(teks)
@@ -1996,7 +1948,6 @@
       const t = String(teks);
       return t.length > maks ? t.substring(0, maks) + '\u2026' : t;
     }
-
 
     function bukaModalDetail_(judul, dataBaris, daftarField) {
       document.getElementById('modalDetailTitle').textContent = judul;
@@ -2033,7 +1984,6 @@
       if (e.key === 'Escape') tutupModalDetail_();
     });
 
-
     let dataRingkasanRealtime = null; // hasil fetch ?fungsi=ringkasanRealtime
     let chartRealtime = null;
     let mapRealtimeInstance = null;
@@ -2041,11 +1991,9 @@
     let stateDrillRealtime = { jenis: null };
     let dataTabelRealtimeMentah = [];
 
-    // State khusus HALAMAN ANTARA (peta gabungan 3 bidang)
     let mapRealtimeGabunganInstance = null;
     let layerMarkerRealtimeGabungan = null;
     let dataGabunganSudahDimuat = false;
-
 
     async function tampilkanHalamanAntaraRealtime() {
       document.getElementById('realtimeAntaraWrap').style.display = 'block';
@@ -2057,7 +2005,7 @@
       ]);
 
       if (dataGabunganSudahDimuat) {
-        muatTitikPetaRealtimeGabungan(); // sudah pernah dimuat, tinggal render ulang
+        muatTitikPetaRealtimeGabungan(); 
         return;
       }
 
@@ -2065,8 +2013,6 @@
       muatTitikPetaRealtimeGabungan();
       dataGabunganSudahDimuat = true;
     }
-
-
     async function muatRingkasanSingkatBidang_() {
       ['Pol PP', 'Polhut', 'Damkar'].forEach(async function(bidang) {
         const idTarget = 'ringkasanAntara' + bidang.replace(/\s+/g, '');
@@ -2083,7 +2029,6 @@
       });
     }
 
-
     document.querySelectorAll('.kartu-pilihan-bidang').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const bidangDipilih = this.dataset.bidang;
@@ -2094,12 +2039,9 @@
     });
 
 
-
     async function muatDataRealtime(namaBidang) {
-
       const bidangBerubah = namaBidang && namaBidang !== bidangRealtimeAktif;
       if (namaBidang) bidangRealtimeAktif = namaBidang;
-
 
       await Promise.race([
         inisialisasiPetaRealtime(),
@@ -2110,7 +2052,7 @@
 
       if (dataRingkasanRealtime && !bidangBerubah) {
         renderChartRealtime();
-        muatTitikPetaRealtime(); // tampilkan seluruh titik (belum difilter jenis) saat pertama masuk
+        muatTitikPetaRealtime(); 
         return;
       }
 
@@ -2230,9 +2172,8 @@
       stateDrillRealtime.jenis = null;
       renderBreadcrumbRealtime();
       document.getElementById('panelDetailRealtime').style.display = 'none';
-      // Peta tidak perlu dimuat ulang -- sudah selalu menampilkan semua titik
-    }
 
+    }
 
     function inisialisasiPetaRealtime() {
       return new Promise(function(resolve) {
@@ -2308,7 +2249,10 @@
       });
     }
 
-
+    // Memetakan kategori ke warna, mencari di SELURUH 3 daftar kategori
+    // bidang (bukan hanya 1 bidang) -- dipakai khusus peta gabungan, karena
+    // warna marker tetap dibedakan per KATEGORI meski sumbernya tercampur
+    // dari Pol PP/Polhut/Damkar (sesuai keputusan yang sudah dikonfirmasi).
     function ambilWarnaKategoriGabungan_(namaKategori) {
       const seluruhKategori = []
         .concat(KONFIGURASI_BIDANG_REALTIME_FE['Pol PP'].daftarJenis)
@@ -2394,7 +2338,12 @@
       }).join('');
     }
 
-
+    // Memetakan nama kategori (Jenis Kejadian) ke warna BOLD untuk marker
+    // peta -- index-nya tetap konsisten dengan urutan warna pastel pada
+    // donut chart (PALET_CHART), hanya nuansanya yang lebih tegas/jenuh
+    // supaya titik mudah terlihat kontras di atas latar peta. Dipakai
+    // khusus halaman DETAIL per bidang (bukan peta gabungan, yang
+    // memakai ambilWarnaKategoriGabungan_ di atas).
     function ambilWarnaKategoriRealtime_(namaKategori) {
       const daftarJenisBidangIni = KONFIGURASI_BIDANG_REALTIME_FE[bidangRealtimeAktif].daftarJenis;
       const indexKategori = daftarJenisBidangIni.indexOf(namaKategori);
@@ -2426,7 +2375,9 @@
         const json = await resp.json();
         if (json.status !== 'success') throw new Error(json.message);
 
-
+        // Hitung berapa kali koordinat yang sama sudah muncul sebelumnya,
+        // untuk menentukan besar/arah offset agar titik identik tidak
+        // saling menutupi sempurna di peta.
         const penandaKoordinat = {};
         const kategoriTerlihat = {}; // untuk mengisi legenda, hanya kategori yang benar-benar ada titiknya
 
@@ -2490,7 +2441,7 @@
       }).join('');
     }
 
-
+    // ============ PANEL DETAIL: TABEL + FILTER (REALTIME) ============
     async function muatTabelDetailRealtime() {
       const panel = document.getElementById('panelDetailRealtime');
       panel.style.display = 'block';
@@ -2595,6 +2546,8 @@
         return { label: 'Jenis Surat', items: itemsLevel1, level: 1 };
       }
 
+      // LEVEL 2: kategori (10 klasifikasi pelanggaran) dalam 1 jenis surat,
+      // hanya tampilkan yang jumlahnya > 0 agar legenda tidak terlalu panjang
       const kategoriSemua = d[stateDrillSurat.sumber].kategori;
       const kategoriAdaIsi = {};
       Object.keys(kategoriSemua).forEach(function(k) {
@@ -2827,7 +2780,6 @@
         console.error('Gagal memuat tren bulanan Surat:', err.message);
       }
     }
-
 
     const btnLight = document.getElementById('btnLight');
     const btnDark = document.getElementById('btnDark');

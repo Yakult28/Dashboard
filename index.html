@@ -721,6 +721,23 @@
     font-weight: 700;
   }
 
+  .panel-chart-head-kanan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .filter-urutan-realtime {
+    font-size: var(--fs-caption1);
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
   .chart-body {
     display: flex;
     gap: 28px;
@@ -1308,7 +1325,14 @@
         <div class="panel-chart">
           <div class="panel-chart-head">
             <div class="panel-chart-title" id="judulChartRealtime">Kategori Laporan</div>
-            <div class="panel-chart-total">Total <strong id="totalChartRealtime">0</strong> laporan</div>
+            <div class="panel-chart-head-kanan">
+              <select class="filter-urutan-realtime" id="filterUrutanRealtime">
+                <option value="terbaru">Terbaru</option>
+                <option value="terbanyak">Terbanyak</option>
+                <option value="az">A-Z</option>
+              </select>
+              <div class="panel-chart-total">Total <strong id="totalChartRealtime">0</strong> laporan</div>
+            </div>
           </div>
           <div class="chart-body">
             <div class="chart-canvas-wrap">
@@ -1996,6 +2020,8 @@
     let layerMarkerRealtime = null;
     let stateDrillRealtime = { jenis: null };
     let dataTabelRealtimeMentah = [];
+    let timestampTerbaruPerKategoriRealtime = {};
+    let urutanLegendaRealtimeAktif = 'terbaru';
 
     let mapRealtimeGabunganInstance = null;
     let layerMarkerRealtimeGabungan = null;
@@ -2046,7 +2072,7 @@
     });
 
     async function muatDataRealtime(namaBidang) {
-      
+
       const bidangBerubah = namaBidang && namaBidang !== bidangRealtimeAktif;
       if (namaBidang) bidangRealtimeAktif = namaBidang;
 
@@ -2058,8 +2084,8 @@
       document.getElementById('headerBidangRealtime').textContent = bidangRealtimeAktif;
 
       if (dataRingkasanRealtime && !bidangBerubah) {
+        await muatTitikPetaRealtime();
         renderChartRealtime();
-        muatTitikPetaRealtime(); 
         return;
       }
 
@@ -2070,8 +2096,8 @@
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat data');
         dataRingkasanRealtime = json.data;
         stateDrillRealtime = { jenis: null };
+        await muatTitikPetaRealtime();
         renderChartRealtime();
-        muatTitikPetaRealtime();
       } catch (err) {
         document.getElementById('judulChartRealtime').textContent = 'Gagal memuat data: ' + err.message;
       }
@@ -2081,11 +2107,17 @@
       const items = dataRingkasanRealtime || {};
       let labels = Object.keys(items);
 
-      labels.sort(function(a, b) {
-        const waktuA = timestampTerbaruPerKategoriRealtime[a] || 0;
-        const waktuB = timestampTerbaruPerKategoriRealtime[b] || 0;
-        return waktuB - waktuA;
-      });
+      if (urutanLegendaRealtimeAktif === 'terbanyak') {
+        labels.sort(function(a, b) { return (items[b] || 0) - (items[a] || 0); });
+      } else if (urutanLegendaRealtimeAktif === 'az') {
+        labels.sort(function(a, b) { return a.localeCompare(b, 'id'); });
+      } else {
+        labels.sort(function(a, b) {
+          const waktuA = timestampTerbaruPerKategoriRealtime[a] || 0;
+          const waktuB = timestampTerbaruPerKategoriRealtime[b] || 0;
+          return waktuB - waktuA;
+        });
+      }
 
       const values = labels.map(function(l) { return items[l]; });
       const total = values.reduce(function(a, b) { return a + b; }, 0);
@@ -2155,6 +2187,21 @@
       renderBreadcrumbRealtime();
       muatTabelDetailRealtime();
       
+    }
+
+    document.getElementById('filterUrutanRealtime').addEventListener('change', function() {
+      urutanLegendaRealtimeAktif = this.value;
+      renderChartRealtime();
+      if (dataTabelRealtimeMentah.length > 0) {
+        urutkanDataTabelRealtime_();
+        renderTabelRealtime();
+      }
+    });
+
+    function urutkanDataTabelRealtime_() {
+      dataTabelRealtimeMentah.sort(function(a, b) {
+        return parseTimestampRealtime_(b['Timestamp']) - parseTimestampRealtime_(a['Timestamp']);
+      });
     }
 
     function renderBreadcrumbRealtime() {
@@ -2364,8 +2411,6 @@
       const lngBaru = Math.round((lng + radiusOffset * Math.sin(radian)) * 1e7) / 1e7;
       return [latBaru, lngBaru];
     }
-
-    let timestampTerbaruPerKategoriRealtime = {};
 
     async function muatTitikPetaRealtime(jenisFilter) {
       if (!layerMarkerRealtime) return;

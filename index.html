@@ -2058,14 +2058,14 @@
           maintainAspectRatio: false,
           animation: { duration: 650, easing: 'easeOutQuart' },
           scales: {
-            x: { stacked: true, grid: { display: false } },
-            y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
+            x: { stacked: false, grid: { display: false } },
+            y: { stacked: false, beginAtZero: true, ticks: { precision: 0 } }
           },
           plugins: {
             legend: { display: false },
             tooltip: {
-              mode: 'index',
-              filter: function(item) { return item.raw > 0; }
+              mode: 'nearest',
+              intersect: true
             }
           }
         }

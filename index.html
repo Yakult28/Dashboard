@@ -71,6 +71,73 @@
 
   button { font-family: inherit; -webkit-appearance: none; }
 
+  #splashScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  #splashScreen.sembunyi {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .splash-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    animation: splashPulse 1.8s ease-in-out infinite;
+  }
+
+  .splash-teks {
+    font-size: var(--fs-subheadline);
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .splash-spinner-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .splash-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-pelaporan);
+    animation: splashDot 1.4s ease-in-out infinite;
+  }
+
+  .splash-dot:nth-child(2) {
+    background: var(--accent-realtime-deep);
+    animation-delay: 0.2s;
+  }
+
+  .splash-dot:nth-child(3) {
+    background: var(--accent-surat);
+    animation-delay: 0.4s;
+  }
+
+  @keyframes splashPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.75; transform: scale(0.95); }
+  }
+
+  @keyframes splashDot {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-8px); opacity: 1; }
+  }
+
   .app-header {
     display: flex;
     align-items: center;
@@ -1113,6 +1180,16 @@
 </head>
 <body data-theme="light">
 
+  <div id="splashScreen" role="status" aria-live="polite">
+    <img class="splash-logo" src="logo-oikn.png" alt="Logo Otorita Ibu Kota Nusantara">
+    <div class="splash-teks">Memuat data&hellip;</div>
+    <div class="splash-spinner-wrap">
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+    </div>
+  </div>
+
   <header class="app-header">
     <div class="header-identity" id="headerHomeLink" role="button" tabindex="0" aria-label="Kembali ke halaman utama" style="cursor:pointer;">
       <img class="header-mark" src="logo-oikn.png" alt="Logo Otorita Ibu Kota Nusantara">
@@ -1476,6 +1553,24 @@
     
     const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbw8e8WzUtG0ViMsMauuqhTF_SUQq5tdRJ5Zz0lwFOwUzfBHCxKcNdjaEb6Q1ASXa_EC/exec';
 
+    const elSplash = document.getElementById('splashScreen');
+    let splashTimeout = null;
+
+    function tampilkanSplash(teks) {
+      if (splashTimeout) clearTimeout(splashTimeout);
+      const elTeks = elSplash.querySelector('.splash-teks');
+      if (elTeks) elTeks.textContent = teks || 'Memuat data\u2026';
+      elSplash.classList.remove('sembunyi');
+    }
+
+    function sembunyikanSplash() {
+      splashTimeout = setTimeout(function() {
+        elSplash.classList.add('sembunyi');
+      }, 300);
+    }
+
+    tampilkanSplash('Memuat dashboard\u2026');
+
     const PALET_CHART = ['#8FB9A8', '#A8C5D6', '#E8A87C', '#C9A8D6', '#D6C9A8', '#A8D6C0', '#D6A8AC', '#A8B5D6'];
 
     const PALET_PETA_BOLD = ['#1F8A5F', '#1565C0', '#E65100', '#8E24AA', '#8D6E10', '#00897B', '#C2185B', '#3949AB'];
@@ -1528,6 +1623,8 @@
         }
       });
     }
+
+    sembunyikanSplash();
 
     document.getElementById('cardPelaporan').addEventListener('click', function() {
       showView('viewPelaporan');
@@ -1632,6 +1729,7 @@
         }
         return;
       }
+      tampilkanSplash('Memuat data Pelaporan\u2026');
       tampilkanLoadingChart('canvasPelaporan');
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanPelaporan');
@@ -1640,7 +1738,6 @@
         dataRingkasanPelaporan = json.data;
         stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
         if (sumberAwal) {
-          
           klikItemPelaporan(sumberAwal);
         } else {
           renderChartPelaporan();
@@ -1648,6 +1745,8 @@
         muatTrenBulananPelaporan();
       } catch (err) {
         document.getElementById('judulChartPelaporan').textContent = 'Gagal memuat data: ' + err.message;
+      } finally {
+        sembunyikanSplash();
       }
     }
 
@@ -2083,6 +2182,8 @@
       const bidangBerubah = namaBidang && namaBidang !== bidangRealtimeAktif;
       if (namaBidang) bidangRealtimeAktif = namaBidang;
 
+      tampilkanSplash('Memuat Laporan Realtime ' + bidangRealtimeAktif + '\u2026');
+
       await Promise.race([
         inisialisasiPetaRealtime(),
         new Promise(function(resolve) { setTimeout(resolve, 2000); })
@@ -2093,6 +2194,7 @@
       if (dataRingkasanRealtime && !bidangBerubah) {
         await muatTitikPetaRealtime();
         renderChartRealtime();
+        sembunyikanSplash();
         return;
       }
 
@@ -2107,6 +2209,8 @@
         renderChartRealtime();
       } catch (err) {
         document.getElementById('judulChartRealtime').textContent = 'Gagal memuat data: ' + err.message;
+      } finally {
+        sembunyikanSplash();
       }
     }
 
@@ -2604,6 +2708,7 @@
         renderChartSurat();
         return;
       }
+      tampilkanSplash('Memuat Rekapan Surat Teguran\u2026');
       document.getElementById('judulChartSurat').textContent = 'Memuat data\u2026';
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanSurat');
@@ -2615,6 +2720,8 @@
         muatTrenBulananSurat();
       } catch (err) {
         document.getElementById('judulChartSurat').textContent = 'Gagal memuat data: ' + err.message;
+      } finally {
+        sembunyikanSplash();
       }
     }
 

@@ -1597,7 +1597,7 @@
     align-items: start;
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 1180px) {
     .side-by-side { grid-template-columns: 1fr; }
   }
 
@@ -1611,8 +1611,12 @@
     overflow: hidden;
   }
 
-  @media (max-width: 860px) {
-    .side-by-side .panel-peta { height: auto; max-height: none; }
+  @media (max-width: 1180px) {
+    .side-by-side .panel-peta { height: 540px; min-height: 420px; max-height: none; }
+  }
+
+  @media (max-width: 640px) {
+    .side-by-side .panel-peta { height: 440px; min-height: 360px; }
   }
 
   .side-by-side .panel-chart {

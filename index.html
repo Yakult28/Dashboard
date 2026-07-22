@@ -2305,11 +2305,12 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     
-    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwm18ipvavDJdUNk5cC56i3de3_EaZ7nCkoUmvDdkZGqYQvYOdW0oa07dhFxOo795Hr/exec';
+    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxluhOJYiUTGyRJGIJ3iYZjZ4B1SX5Xp2H27imd5IwrSD7SDs9hZ6GX6s8KmSJijgxx/exec';
 
-    let tokenSesi = sessionStorage.getItem('trantibum_token') || '';
-    let peranSesi = sessionStorage.getItem('trantibum_peran') || '';
-    let namaSesi = sessionStorage.getItem('trantibum_nama') || '';
+    let tokenSesi = localStorage.getItem('trantibum_token') || '';
+    let peranSesi = localStorage.getItem('trantibum_peran') || '';
+    let namaSesi = localStorage.getItem('trantibum_nama') || '';
+    let rememberTokenSesi = localStorage.getItem('trantibum_remember_token') || '';
 
     const _fetchAsli = window.fetch.bind(window);
     window.fetch = function(url, opts) {
@@ -2329,10 +2330,11 @@
     };
 
     function keluarKeLogin_(pesan) {
-      tokenSesi = ''; peranSesi = ''; namaSesi = '';
-      sessionStorage.removeItem('trantibum_token');
-      sessionStorage.removeItem('trantibum_peran');
-      sessionStorage.removeItem('trantibum_nama');
+      tokenSesi = ''; peranSesi = ''; namaSesi = ''; rememberTokenSesi = '';
+      localStorage.removeItem('trantibum_token');
+      localStorage.removeItem('trantibum_peran');
+      localStorage.removeItem('trantibum_nama');
+      localStorage.removeItem('trantibum_remember_token');
       document.body.classList.remove('mode-koordinator');
       document.getElementById('headerUser').style.display = 'none';
       document.getElementById('loginOverlay').classList.remove('tersembunyi');
@@ -2374,6 +2376,21 @@
       document.getElementById('headerUserNama').textContent = namaSesi + ' (' + peranSesi.replace(/_/g, ' ') + ')';
     }
 
+    // Membaca alamat setelah tanda pagar (#pelaporan / #realtime / #surat) dan langsung
+    // membuka bagian yang dimaksud, seolah-olah kartunya diklik. Dipanggil hanya
+    // setelah status login dipastikan (baik login manual maupun otomatis via remember-token).
+    function terapkanRoutingHash_() {
+      const hash = (location.hash || '').replace('#', '').trim().toLowerCase();
+      if (!hash) return;
+      if (hash === 'pelaporan') {
+        document.getElementById('cardPelaporan').click();
+      } else if (hash === 'realtime') {
+        document.getElementById('cardRealtime').click();
+      } else if (hash === 'surat') {
+        document.getElementById('cardSurat').click();
+      }
+    }
+
     async function prosesLogin_() {
       const username = document.getElementById('loginUsername').value.trim();
       const password = document.getElementById('loginPassword').value;
@@ -2392,13 +2409,16 @@
         if (json.status !== 'success') throw new Error(json.message || 'Login gagal.');
 
         tokenSesi = json.token; peranSesi = json.peran; namaSesi = json.nama;
-        sessionStorage.setItem('trantibum_token', tokenSesi);
-        sessionStorage.setItem('trantibum_peran', peranSesi);
-        sessionStorage.setItem('trantibum_nama', namaSesi);
+        rememberTokenSesi = json.rememberToken || '';
+        localStorage.setItem('trantibum_token', tokenSesi);
+        localStorage.setItem('trantibum_peran', peranSesi);
+        localStorage.setItem('trantibum_nama', namaSesi);
+        if (rememberTokenSesi) localStorage.setItem('trantibum_remember_token', rememberTokenSesi);
 
         document.getElementById('loginPassword').value = '';
         document.getElementById('loginOverlay').classList.add('tersembunyi');
         terapkanPeran_();
+        terapkanRoutingHash_();
       } catch (err) {
         errEl.textContent = err.message;
       } finally {
@@ -2416,9 +2436,39 @@
       showView('landingView');
     });
 
-    if (tokenSesi) {
-      document.getElementById('loginOverlay').classList.add('tersembunyi');
-      terapkanPeran_();
+    // Coba sambungkan sesi secara otomatis saat halaman dibuka:
+    // 1) Kalau ada token sesi aktif tersimpan (masih dalam masa cache 6 jam terakhir), langsung pakai.
+    // 2) Kalau tidak, tapi ada remember-token (masa berlaku hingga 7 hari), tukar otomatis
+    //    jadi sesi baru lewat server tanpa perlu username/password lagi.
+    // 3) Kalau dua-duanya tidak ada/gagal, tampilkan layar login seperti biasa.
+    async function cobaSambungkanSesiOtomatis_() {
+      if (tokenSesi) {
+        document.getElementById('loginOverlay').classList.add('tersembunyi');
+        terapkanPeran_();
+        terapkanRoutingHash_();
+        sembunyikanSplash();
+        return;
+      }
+      if (rememberTokenSesi) {
+        tampilkanSplash('Memeriksa sesi tersimpan\u2026');
+        try {
+          const resp = await fetch(API_BASE_URL + '?fungsi=loginDenganRememberToken&rememberToken=' + encodeURIComponent(rememberTokenSesi));
+          const json = await resp.json();
+          if (json.status === 'success') {
+            tokenSesi = json.token; peranSesi = json.peran; namaSesi = json.nama;
+            localStorage.setItem('trantibum_token', tokenSesi);
+            localStorage.setItem('trantibum_peran', peranSesi);
+            localStorage.setItem('trantibum_nama', namaSesi);
+            document.getElementById('loginOverlay').classList.add('tersembunyi');
+            terapkanPeran_();
+            terapkanRoutingHash_();
+            sembunyikanSplash();
+            return;
+          }
+        } catch (e) { /* biarkan jatuh ke layar login di bawah */ }
+        localStorage.removeItem('trantibum_remember_token');
+      }
+      sembunyikanSplash();
     }
 
     const elSplash = document.getElementById('splashScreen');
@@ -2497,8 +2547,6 @@
         }
       });
     }
-
-    sembunyikanSplash();
 
     document.getElementById('cardPelaporan').addEventListener('click', function() {
       showView('viewPelaporan');
@@ -2905,21 +2953,15 @@
 
     async function muatTrenBulananPelaporan() {
       try {
-        console.log('[TREN] Memulai fetch trenBulananPelaporan...');
         const resp = await fetch(API_BASE_URL + '?fungsi=trenBulananPelaporan');
         const json = await resp.json();
-        console.log('[TREN] Response status:', json.status);
-        console.log('[TREN] bulanUrut:', json.bulanUrut);
-        console.log('[TREN] sumberList:', json.sumberList);
         if (json.status !== 'success') throw new Error(json.message);
         dataTrenPelaporan = json;
         const tipeAktifPelaporan = (document.querySelector('#toggleGrafikPelaporan .toggle-grafik-btn.active') || {}).dataset || { tipe: 'bar' };
-        console.log('[TREN] tipe grafik:', tipeAktifPelaporan.tipe || 'bar');
         chartTrenPelaporan = renderStackedBarChart_(
           'canvasTrenPelaporan', chartTrenPelaporan, json.bulanUrut, json.sumberList, json.data,
           tipeAktifPelaporan.tipe || 'bar'
         );
-        console.log('[TREN] Chart dibuat:', chartTrenPelaporan);
       } catch (err) {
         console.error('[TREN] Gagal:', err.message);
       }
@@ -3640,7 +3682,7 @@ Tulis laporan lengkap sekarang. Pastikan setiap klaim berakar pada temuan nyata 
         let pesanErr = 'Gemini API error ' + resp.status;
         try {
           const err = await resp.json();
-          pesanErr = err.error?.message || pesanErr;
+          pesanErr = (err.error && err.error.message) || pesanErr;
         } catch(e) {}
         if (resp.status === 400 || resp.status === 403) {
           pesanErr += ' \u2014 Periksa apakah API key benar dan aktif di aistudio.google.com';
@@ -3649,7 +3691,7 @@ Tulis laporan lengkap sekarang. Pastikan setiap klaim berakar pada temuan nyata 
       }
 
       const json = await resp.json();
-      const teks = json.candidates?.[0]?.content?.parts?.[0]?.text;
+      const teks = json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text;
       if (!teks) throw new Error('Respons AI kosong atau tidak valid.');
       return teks;
     }
@@ -4461,7 +4503,7 @@ Tulis laporan lengkap sekarang. Pastikan setiap klaim berakar pada temuan nyata 
     btnLight.addEventListener('click', function() { setTheme('light'); });
     btnDark.addEventListener('click', function() { setTheme('dark'); });
 
-    showView('landingView');
+    cobaSambungkanSesiOtomatis_();
   </script>
 
 </body>

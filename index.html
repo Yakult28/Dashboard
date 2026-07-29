@@ -1855,6 +1855,36 @@
     const RK_BULAN_URUT = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
     const RK_DOTS = ['#8FB9A8','#A8C5D6','#E8A87C','#C9A8D6','#D6A8AC','#A8D6C0','#D6C9A8','#B8A8D6'];
 
+    /* Kategori tetap per jenis laporan — didefinisikan di frontend agar selalu
+       tampil tanpa bergantung pada data API atau status deployment Apps Script. */
+    const PETA_KATEGORI_LAPORAN = {
+      'Laporan Kegiatan Rapat': [
+        'Teknis', 'Non Teknis'
+      ],
+      'Laporan Patroli Malam': [
+        'Temuan', 'Tanpa Temuan'
+      ],
+      'Laporan Kegiatan Satpol PP': [
+        'Penertiban', 'Pengamanan', 'Patroli', 'Sosialisasi',
+        'Pencurian', 'Perbuatan Onar', 'Penyuluhan', 'Operasi Gabungan'
+      ],
+      'Laporan Kejadian Kriminal di Wilayah IKN': [
+        'Pencurian', 'Perbuatan Onar', 'Penganiayaan', 'Penipuan',
+        'Penyalahgunaan Narkoba', 'Kekerasan', 'Lainnya'
+      ],
+      'Laporan Damkar': [
+        'Pemadaman Kebakaran', 'Evakuasi Ular', 'Evakuasi Tawon',
+        'Evakuasi Lebah', 'Evakuasi Hewan Lainnya', 'Evakuasi Banjir',
+        'Evakuasi Kendaraan', 'Simulasi Kebakaran', 'Kegiatan Pengamanan',
+        'Pemeriksaan Defect Gedung', 'Pembersihan Jalan', 'Sosialisasi',
+        'Pengecekan Sarana Damkar', 'Koordinasi SOP', 'Apel Kebencanaan', 'Rapat'
+      ],
+      'Laporan Polhut': [
+        'Monitoring dan Evaluasi', 'Patroli Kawasan', 'Evakuasi Satwa Liar',
+        'Tindak Lanjut Kejadian', 'Kecelakaan Lalu Lintas', 'Joint Survey', 'Satgas Ilegal'
+      ]
+    };
+
     function bukaHalamanRekap() {
       showView('viewRekap');
       tampilkanSplash('Memuat Rekap Laporan\u2026');
@@ -1991,39 +2021,62 @@
     function rkRenderKategoriPanel_() {
       const data = rkDataAktif;
       const wrap = document.getElementById('rkKategoriList');
-      if (!data) { wrap.innerHTML = '<div class="rk-kat-placeholder">Pilih sumber laporan untuk melihat kategorinya</div>'; return; }
 
-      /* Jika belum ada sumber yang dipilih, tampilkan placeholder */
-      if (!rkSumberFilter) {
-        wrap.innerHTML = '<div class="rk-kat-placeholder">Klik salah satu sumber laporan di kiri untuk melihat kategori miliknya</div>';
+      if (!data) {
+        wrap.innerHTML = '<div class="rk-kat-placeholder">Pilih sumber laporan untuk melihat kategorinya</div>';
         return;
       }
 
-      /* Ambil kategori khusus milik sumber yang dipilih */
-      let perKat = {};
-      if (data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
-        /* Data tersedia — tampilkan kategori milik sumber ini saja */
-        perKat = data.perKategoriPerSumber[rkSumberFilter];
-      } else if (!data.perKategoriPerSumber) {
-        /* API lama (belum redeploy) — tampilkan semua kategori sebagai fallback */
-        perKat = data.perKategori || {};
+      /* Belum ada sumber dipilih */
+      if (!rkSumberFilter) {
+        wrap.innerHTML = '<div class="rk-kat-placeholder">Klik salah satu sumber laporan untuk melihat kategori miliknya</div>';
+        return;
       }
-      /* perKategoriPerSumber ada tapi sumber ini tidak punya entry → perKat tetap {} */
 
-      const entri = Object.entries(perKat)
-        .filter(function(e){ return e[1] > 0 && e[0] !== '-'; })
-        .sort(function(a,b){ return b[1]-a[1]; });
+      /* Gunakan KONSTANTA sebagai sumber utama kategori — selalu lengkap */
+      const kategoriTetap = PETA_KATEGORI_LAPORAN[rkSumberFilter];
+
+      /* Ambil count dari API jika tersedia */
+      const perKatAPI = (data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter])
+        ? data.perKategoriPerSumber[rkSumberFilter]
+        : null;
+
+      let entri = [];
+
+      if (kategoriTetap) {
+        /* Pakai daftar tetap, isi count dari API */
+        entri = kategoriTetap
+          .filter(function(kat) {
+            /* Sembunyikan yang count 0 hanya bila API sudah ada data */
+            if (perKatAPI !== null && (perKatAPI[kat] || 0) === 0) return false;
+            return true;
+          })
+          .map(function(kat) { return [kat]; });
+      } else if (perKatAPI) {
+        /* Sumber tidak terdaftar di PETA — fallback ke data API */
+        entri = Object.entries(perKatAPI)
+          .filter(function(e){ return e[1] > 0 && e[0] !== '-'; })
+          .sort(function(a,b){ return b[1]-a[1]; })
+          .map(function(e){ return [e[0]]; });
+      } else if (data.perKategori) {
+        /* Fallback terakhir: semua kategori gabungan */
+        entri = Object.entries(data.perKategori)
+          .filter(function(e){ return e[1] > 0 && e[0] !== '-'; })
+          .sort(function(a,b){ return b[1]-a[1]; })
+          .map(function(e){ return [e[0]]; });
+      }
 
       if (!entri.length) {
-        wrap.innerHTML = '<div class="rk-kat-placeholder">Tidak ada kategori tercatat untuk sumber ini</div>';
+        wrap.innerHTML = '<div class="rk-kat-placeholder">Tidak ada kategori tercatat untuk sumber ini pada periode ini</div>';
         return;
       }
 
-      /* Render chip — hanya nama saja */
+      /* Render chip — hanya nama, tanpa bar/angka */
       wrap.innerHTML = entri.map(function(e) {
-        const isAktif = rkKategoriFilter === e[0];
-        return '<button class="rk-kat-chip' + (isAktif ? ' aktif' : '') + '" data-kat="' + escapeHtml(e[0]) + '">' +
-          escapeHtml(e[0]) +
+        const namaKat = e[0];
+        const isAktif = rkKategoriFilter === namaKat;
+        return '<button class="rk-kat-chip' + (isAktif ? ' aktif' : '') + '" data-kat="' + escapeHtml(namaKat) + '">' +
+          escapeHtml(namaKat) +
           '</button>';
       }).join('');
 
@@ -2031,7 +2084,6 @@
         chip.addEventListener('click', function() {
           const kat = this.dataset.kat;
           if (rkKategoriFilter === kat) {
-            /* Toggle off */
             rkKategoriFilter = null;
             document.getElementById('rkChipFilterKategori').classList.remove('tampil');
           } else {

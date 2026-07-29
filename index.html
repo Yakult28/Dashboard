@@ -421,7 +421,7 @@
   .rk-stat-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; }
   .rk-stat-val { font-size: 19px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* 3-kolom panel */
-  .rk-tiga-kolom { display: grid; grid-template-columns: 1fr 1fr 210px; gap: 14px; align-items: start; }
+  .rk-tiga-kolom { display: grid; grid-template-columns: 1fr 1fr 240px; gap: 14px; align-items: start; }
   @media (max-width: 1100px) { .rk-tiga-kolom { grid-template-columns: 1fr 1fr; } .rk-bulan-panel { grid-column: span 2; } }
   .rk-panel { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
   .rk-panel-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 12px; }
@@ -447,8 +447,8 @@
   .rk-kat-jml { font-size: 12px; font-weight: 700; color: var(--text-secondary); min-width: 24px; text-align: right; }
   /* Bulan panel */
   .rk-bulan-panel { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
-  .rk-bulan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
-  .rk-bulan-chip { background: var(--bg); border: 1.5px solid var(--border); border-radius: 9px; padding: 9px 4px; text-align: center; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-primary); transition: background 0.15s, border-color 0.15s, color 0.15s; user-select: none; font-family: inherit; }
+  .rk-bulan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
+  .rk-bulan-chip { background: var(--bg); border: 1.5px solid var(--border); border-radius: 9px; padding: 8px 10px; text-align: center; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-primary); transition: background 0.15s, border-color 0.15s, color 0.15s; user-select: none; font-family: inherit; line-height: 1.2; }
   .rk-bulan-chip:hover { border-color: var(--accent-pelaporan); }
   .rk-bulan-chip.terpilih { background: var(--accent-pelaporan-deep); border-color: var(--accent-pelaporan-deep); color: #fff; }
   .rk-bulan-actions { display: flex; gap: 6px; margin-bottom: 10px; }
@@ -881,18 +881,18 @@
         <div class="rk-bulan-panel">
           <div class="rk-panel-title">Pilih Bulan <span class="rk-badge-baru">BARU</span></div>
           <div class="rk-bulan-grid" id="rkBulanGrid">
-            <button class="rk-bulan-chip" data-bulan="Januari">Jan</button>
-            <button class="rk-bulan-chip" data-bulan="Februari">Feb</button>
-            <button class="rk-bulan-chip" data-bulan="Maret">Mar</button>
-            <button class="rk-bulan-chip" data-bulan="April">Apr</button>
+            <button class="rk-bulan-chip" data-bulan="Januari">Januari</button>
+            <button class="rk-bulan-chip" data-bulan="Februari">Februari</button>
+            <button class="rk-bulan-chip" data-bulan="Maret">Maret</button>
+            <button class="rk-bulan-chip" data-bulan="April">April</button>
             <button class="rk-bulan-chip" data-bulan="Mei">Mei</button>
-            <button class="rk-bulan-chip" data-bulan="Juni">Jun</button>
-            <button class="rk-bulan-chip" data-bulan="Juli">Jul</button>
-            <button class="rk-bulan-chip" data-bulan="Agustus">Agu</button>
-            <button class="rk-bulan-chip" data-bulan="September">Sep</button>
-            <button class="rk-bulan-chip" data-bulan="Oktober">Okt</button>
-            <button class="rk-bulan-chip" data-bulan="November">Nov</button>
-            <button class="rk-bulan-chip" data-bulan="Desember">Des</button>
+            <button class="rk-bulan-chip" data-bulan="Juni">Juni</button>
+            <button class="rk-bulan-chip" data-bulan="Juli">Juli</button>
+            <button class="rk-bulan-chip" data-bulan="Agustus">Agustus</button>
+            <button class="rk-bulan-chip" data-bulan="September">September</button>
+            <button class="rk-bulan-chip" data-bulan="Oktober">Oktober</button>
+            <button class="rk-bulan-chip" data-bulan="November">November</button>
+            <button class="rk-bulan-chip" data-bulan="Desember">Desember</button>
           </div>
           <div class="rk-bulan-actions">
             <button class="rk-btn-bulan-aksi" id="rkBtnPilihSemua">Pilih Semua</button>
@@ -1857,11 +1857,13 @@
 
     function bukaHalamanRekap() {
       showView('viewRekap');
+      tampilkanSplash('Memuat Rekap Laporan\u2026');
       rkMuatSemuaTotal_();
       if (!rkDataAktif) {
         rkPilihTW_('TW1');
       } else {
         rkRenderSemua_();
+        sembunyikanSplash();
       }
     }
 
@@ -2000,8 +2002,13 @@
       /* Ambil kategori khusus milik sumber yang dipilih */
       let perKat = {};
       if (data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
+        /* Data tersedia — tampilkan kategori milik sumber ini saja */
         perKat = data.perKategoriPerSumber[rkSumberFilter];
+      } else if (!data.perKategoriPerSumber) {
+        /* API lama (belum redeploy) — tampilkan semua kategori sebagai fallback */
+        perKat = data.perKategori || {};
       }
+      /* perKategoriPerSumber ada tapi sumber ini tidak punya entry → perKat tetap {} */
 
       const entri = Object.entries(perKat)
         .filter(function(e){ return e[1] > 0 && e[0] !== '-'; })

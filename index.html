@@ -433,8 +433,9 @@
   .rk-sumber-nama { flex: 1; color: var(--text-primary); font-size: 12px; line-height: 1.3; }
   .rk-sumber-jml { font-size: 12px; font-weight: 700; color: var(--accent-pelaporan-deep); }
   /* Kategori panel */
-  .rk-kat-row { display: flex; align-items: center; gap: 8px; padding: 7px 6px; border-radius: 8px; cursor: default; margin-bottom: 2px; transition: background 0.15s; }
+  .rk-kat-row { display: flex; align-items: center; gap: 8px; padding: 7px 6px; border-radius: 8px; cursor: pointer; margin-bottom: 2px; transition: background 0.15s; border: 1.5px solid transparent; }
   .rk-kat-row:hover { background: var(--bg); }
+  .rk-kat-row.aktif { background: color-mix(in srgb, var(--accent-pelaporan) 10%, var(--bg)); border-color: var(--accent-pelaporan); }
   .rk-kat-nama { width: 130px; color: var(--text-primary); font-size: 12px; line-height: 1.3; flex-shrink: 0; }
   .rk-kat-bar-wrap { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
   .rk-kat-bar { height: 4px; background: var(--accent-pelaporan); border-radius: 2px; transition: width 0.4s ease; }
@@ -906,6 +907,10 @@
             <div class="rk-chip-filter" id="rkChipFilterSumber">
               <span id="rkChipFilterLabel">Filter: &mdash;</span>
               <button id="rkBtnResetFilter">&#x2715; tampilkan semua</button>
+            </div>
+            <div class="rk-chip-filter" id="rkChipFilterKategori">
+              <span id="rkChipKategoriLabel">Kategori: &mdash;</span>
+              <button id="rkBtnResetFilterKategori">&#x2715; tampilkan semua</button>
             </div>
           </div>
           <button class="btn-rekap-laporan" id="btnGenerateLaporan">
@@ -1832,6 +1837,7 @@
     let rkModeBulanan = false;
     let rkBulanAktif = [];
     let rkSumberFilter = null;
+    let rkKategoriFilter = null;
     let rkDataAktif = null;
     const TAHUN_REKAP = String(new Date().getFullYear());
     const RK_RENTANG = {
@@ -1876,7 +1882,9 @@
       rkKodeAktif = kode;
       rkModeBulanan = false;
       rkSumberFilter = null;
+      rkKategoriFilter = null;
       document.getElementById('rkChipFilterSumber').classList.remove('tampil');
+      document.getElementById('rkChipFilterKategori').classList.remove('tampil');
       document.querySelectorAll('.rk-tw-card').forEach(function(c) {
         c.classList.toggle('aktif', c.dataset.tw === kode);
       });
@@ -1982,12 +1990,34 @@
       if (!entri.length) { wrap.innerHTML = '<div class="table-loading">Tidak ada data</div>'; return; }
       wrap.innerHTML = entri.map(function(e) {
         const persen = Math.round((e[1]/max)*100);
-        return '<div class="rk-kat-row">' +
+        const isAktif = rkKategoriFilter === e[0];
+        return '<div class="rk-kat-row' + (isAktif ? ' aktif' : '') + '" data-kat="' + escapeHtml(e[0]) + '">' +
           '<div class="rk-kat-nama">' + escapeHtml(e[0]) + '</div>' +
           '<div class="rk-kat-bar-wrap"><div class="rk-kat-bar" style="width:' + persen + '%"></div></div>' +
           '<div class="rk-kat-jml">' + e[1] + '</div>' +
           '</div>';
       }).join('');
+      /* Tambahkan click handler ke setiap baris kategori */
+      wrap.querySelectorAll('.rk-kat-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+          const kat = this.dataset.kat;
+          if (rkKategoriFilter === kat) {
+            /* Toggle off — reset filter */
+            rkKategoriFilter = null;
+            document.getElementById('rkChipFilterKategori').classList.remove('tampil');
+          } else {
+            rkKategoriFilter = kat;
+            document.getElementById('rkChipKategoriLabel').textContent = 'Kategori: ' + kat;
+            document.getElementById('rkChipFilterKategori').classList.add('tampil');
+          }
+          /* Update aktif state */
+          wrap.querySelectorAll('.rk-kat-row').forEach(function(r) {
+            r.classList.toggle('aktif', r.dataset.kat === rkKategoriFilter);
+          });
+          /* Update tabel di bawah */
+          rkRenderTabelSumber_();
+        });
+      });
     }
 
     function rkRenderTabelSumber_() {
@@ -1996,7 +2026,28 @@
       const total = data.total || 1;
       const thead = document.querySelector('#rkTabelSumber thead tr');
       let html;
-      if (rkSumberFilter && data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
+
+      if (rkKategoriFilter) {
+        /* Mode: filter by kategori — tampilkan per sumber untuk kategori ini */
+        const perSumberUntukKat = {};
+        if (data.perKategoriPerSumber) {
+          Object.entries(data.perKategoriPerSumber).forEach(function(e) {
+            const sumber = e[0];
+            const perKat = e[1];
+            if (perKat[rkKategoriFilter]) {
+              perSumberUntukKat[sumber] = perKat[rkKategoriFilter];
+            }
+          });
+        }
+        const entri = Object.entries(perSumberUntukKat).sort(function(a,b){ return b[1]-a[1]; });
+        const katTotal = entri.reduce(function(s,e){ return s+e[1]; }, 0);
+        document.getElementById('rkTabelTitle').textContent = 'Rincian per Sumber \u2014 ' + rkKategoriFilter;
+        thead.innerHTML = '<th>Sumber Laporan</th><th>Jumlah</th><th>Proporsi (%)</th>';
+        html = entri.map(function(e) {
+          const p = katTotal > 0 ? ((e[1]/katTotal)*100).toFixed(1) : 0;
+          return '<tr><td>' + escapeHtml(e[0]) + '</td><td><strong>' + e[1] + '</strong></td><td>' + p + '%</td></tr>';
+        }).join('');
+      } else if (rkSumberFilter && data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
         const perKat = data.perKategoriPerSumber[rkSumberFilter];
         const entri = Object.entries(perKat).filter(function(e){ return e[1]>0; }).sort(function(a,b){ return b[1]-a[1]; });
         const sumberTotal = entri.reduce(function(s,e){ return s+e[1]; }, 0);
@@ -2092,7 +2143,9 @@
         rkModeBulanan = true;
         rkKodeAktif = 'BULANAN';
         rkSumberFilter = null;
+        rkKategoriFilter = null;
         document.getElementById('rkChipFilterSumber').classList.remove('tampil');
+        document.getElementById('rkChipFilterKategori').classList.remove('tampil');
         document.querySelectorAll('.rk-tw-card').forEach(function(c) { c.classList.remove('aktif'); });
         const periodeLabel = document.getElementById('rkPeriodeLabel').textContent;
         document.getElementById('rkBadgePeriode').textContent = 'Rekap Bulan \u00b7 ' + periodeLabel;
@@ -2114,6 +2167,13 @@
       const semua = wrap.querySelector('[data-sumber="__semua__"]');
       if (semua) semua.classList.add('aktif');
       rkRenderKategoriPanel_();
+      rkRenderTabelSumber_();
+    });
+    /* ── Reset filter kategori ── */
+    document.getElementById('rkBtnResetFilterKategori').addEventListener('click', function() {
+      rkKategoriFilter = null;
+      document.getElementById('rkChipFilterKategori').classList.remove('tampil');
+      document.querySelectorAll('.rk-kat-row').forEach(function(r) { r.classList.remove('aktif'); });
       rkRenderTabelSumber_();
     });
 

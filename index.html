@@ -436,6 +436,11 @@
   .rk-kat-row { display: flex; align-items: center; gap: 8px; padding: 7px 6px; border-radius: 8px; cursor: pointer; margin-bottom: 2px; transition: background 0.15s; border: 1.5px solid transparent; }
   .rk-kat-row:hover { background: var(--bg); }
   .rk-kat-row.aktif { background: color-mix(in srgb, var(--accent-pelaporan) 10%, var(--bg)); border-color: var(--accent-pelaporan); }
+  /* Chip kategori — hanya nama, tanpa bar */
+  .rk-kat-chip { display: block; width: 100%; text-align: left; padding: 9px 12px; border-radius: 9px; border: 1.5px solid transparent; background: none; cursor: pointer; font-size: 13px; font-family: inherit; color: var(--text-primary); transition: background 0.15s, border-color 0.15s, color 0.15s; margin-bottom: 3px; line-height: 1.35; }
+  .rk-kat-chip:hover { background: var(--bg); border-color: var(--border); }
+  .rk-kat-chip.aktif { background: color-mix(in srgb, var(--accent-pelaporan) 12%, var(--bg)); border-color: var(--accent-pelaporan); color: var(--accent-pelaporan-deep); font-weight: 600; }
+  .rk-kat-placeholder { font-size: 12px; color: var(--text-tertiary); padding: 16px 4px; text-align: center; line-height: 1.6; }
   .rk-kat-nama { width: 130px; color: var(--text-primary); font-size: 12px; line-height: 1.3; flex-shrink: 0; }
   .rk-kat-bar-wrap { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
   .rk-kat-bar { height: 4px; background: var(--accent-pelaporan); border-radius: 2px; transition: width 0.4s ease; }
@@ -793,6 +798,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         Kembali
       </button>
+      <!-- Rekap Bulan di atas -->
+      <div class="rk-sidebar-accent-label">Rekap Bulan <span class="rk-badge-baru">BARU</span></div>
+      <button class="rk-btn-bulan-sidebar" id="rkBtnBulanSidebar">
+        <span class="rk-btn-bulan-label">Pilih Bulan Bebas</span>
+        <span class="rk-btn-bulan-sub">Pilih 1&ndash;12 bulan sekaligus</span>
+      </button>
+      <div class="rk-sidebar-divider"></div>
+      <!-- Rekap Triwulan di bawah -->
       <div class="rk-sidebar-label">Rekap Triwulan</div>
       <button class="rk-tw-card aktif" data-tw="TW1">
         <div class="rk-tw-kode">TW I</div>
@@ -818,12 +831,6 @@
         <div class="rk-tw-kode">Tahunan</div>
         <div class="rk-tw-bulan">Januari &ndash; Desember</div>
         <div class="rk-tw-total muat" id="rkTotalTahunan">Memuat&hellip;</div>
-      </button>
-      <div class="rk-sidebar-divider"></div>
-      <div class="rk-sidebar-accent-label">Rekap Bulan <span class="rk-badge-baru">BARU</span></div>
-      <button class="rk-btn-bulan-sidebar" id="rkBtnBulanSidebar">
-        <span class="rk-btn-bulan-label">Pilih Bulan Bebas</span>
-        <span class="rk-btn-bulan-sub">Pilih 1&ndash;12 bulan sekaligus</span>
       </button>
     </div>
 
@@ -1934,6 +1941,7 @@
       document.getElementById('rkStatKategori').textContent = kategoriEntri.length ? kategoriEntri[0][0] : '\u2014';
       document.getElementById('rkStatBulan').textContent = bulanEntri.length ? bulanEntri[0][0] : '\u2014';
       rkRenderSumberPanel_();
+      /* Kategori panel: tampilkan placeholder jika belum ada sumber terpilih */
       rkRenderKategoriPanel_();
       rkRenderTabelSumber_();
     }
@@ -1959,6 +1967,9 @@
       wrap.querySelectorAll('.rk-sumber-item').forEach(function(btn) {
         btn.addEventListener('click', function() {
           const s = this.dataset.sumber;
+          /* Reset filter kategori setiap kali sumber berubah */
+          rkKategoriFilter = null;
+          document.getElementById('rkChipFilterKategori').classList.remove('tampil');
           rkSumberFilter = (s === '__semua__') ? null : s;
           wrap.querySelectorAll('.rk-sumber-item').forEach(function(b) { b.classList.remove('aktif'); });
           this.classList.add('aktif');
@@ -1977,32 +1988,43 @@
 
     function rkRenderKategoriPanel_() {
       const data = rkDataAktif;
-      if (!data) return;
-      let perKat;
-      if (rkSumberFilter && data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
-        perKat = data.perKategoriPerSumber[rkSumberFilter];
-      } else {
-        perKat = data.perKategori || {};
-      }
-      const entri = Object.entries(perKat).filter(function(e){ return e[1] > 0; }).sort(function(a,b){ return b[1]-a[1]; });
-      const max = entri.length ? entri[0][1] : 1;
       const wrap = document.getElementById('rkKategoriList');
-      if (!entri.length) { wrap.innerHTML = '<div class="table-loading">Tidak ada data</div>'; return; }
+      if (!data) { wrap.innerHTML = '<div class="rk-kat-placeholder">Pilih sumber laporan untuk melihat kategorinya</div>'; return; }
+
+      /* Jika belum ada sumber yang dipilih, tampilkan placeholder */
+      if (!rkSumberFilter) {
+        wrap.innerHTML = '<div class="rk-kat-placeholder">Klik salah satu sumber laporan di kiri untuk melihat kategori miliknya</div>';
+        return;
+      }
+
+      /* Ambil kategori khusus milik sumber yang dipilih */
+      let perKat = {};
+      if (data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
+        perKat = data.perKategoriPerSumber[rkSumberFilter];
+      }
+
+      const entri = Object.entries(perKat)
+        .filter(function(e){ return e[1] > 0 && e[0] !== '-'; })
+        .sort(function(a,b){ return b[1]-a[1]; });
+
+      if (!entri.length) {
+        wrap.innerHTML = '<div class="rk-kat-placeholder">Tidak ada kategori tercatat untuk sumber ini</div>';
+        return;
+      }
+
+      /* Render chip — hanya nama saja */
       wrap.innerHTML = entri.map(function(e) {
-        const persen = Math.round((e[1]/max)*100);
         const isAktif = rkKategoriFilter === e[0];
-        return '<div class="rk-kat-row' + (isAktif ? ' aktif' : '') + '" data-kat="' + escapeHtml(e[0]) + '">' +
-          '<div class="rk-kat-nama">' + escapeHtml(e[0]) + '</div>' +
-          '<div class="rk-kat-bar-wrap"><div class="rk-kat-bar" style="width:' + persen + '%"></div></div>' +
-          '<div class="rk-kat-jml">' + e[1] + '</div>' +
-          '</div>';
+        return '<button class="rk-kat-chip' + (isAktif ? ' aktif' : '') + '" data-kat="' + escapeHtml(e[0]) + '">' +
+          escapeHtml(e[0]) +
+          '</button>';
       }).join('');
-      /* Tambahkan click handler ke setiap baris kategori */
-      wrap.querySelectorAll('.rk-kat-row').forEach(function(row) {
-        row.addEventListener('click', function() {
+
+      wrap.querySelectorAll('.rk-kat-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
           const kat = this.dataset.kat;
           if (rkKategoriFilter === kat) {
-            /* Toggle off — reset filter */
+            /* Toggle off */
             rkKategoriFilter = null;
             document.getElementById('rkChipFilterKategori').classList.remove('tampil');
           } else {
@@ -2010,11 +2032,9 @@
             document.getElementById('rkChipKategoriLabel').textContent = 'Kategori: ' + kat;
             document.getElementById('rkChipFilterKategori').classList.add('tampil');
           }
-          /* Update aktif state */
-          wrap.querySelectorAll('.rk-kat-row').forEach(function(r) {
-            r.classList.toggle('aktif', r.dataset.kat === rkKategoriFilter);
+          wrap.querySelectorAll('.rk-kat-chip').forEach(function(c) {
+            c.classList.toggle('aktif', c.dataset.kat === rkKategoriFilter);
           });
-          /* Update tabel di bawah */
           rkRenderTabelSumber_();
         });
       });

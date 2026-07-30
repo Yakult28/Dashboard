@@ -381,7 +381,7 @@
   .rk-step-item.selesai .rk-step-num, .rk-step-item.aktif .rk-step-num { background:var(--accent-pelaporan-deep); border-color:var(--accent-pelaporan-deep); color:#fff; }
   .rk-step-sep { width:28px; height:1px; background:var(--border); margin:0 3px; }
   /* Jenis cards */
-  .rk-jenis-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:860px; }
+  .rk-jenis-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
   .rk-jenis-card { background:var(--bg-elevated); border:1.5px solid var(--border); border-radius:16px; padding:26px 20px; cursor:pointer; text-align:left; transition:border-color .2s, transform .15s, box-shadow .2s; }
   .rk-jenis-card:hover { border-color:var(--accent-pelaporan); transform:translateY(-2px); box-shadow:0 8px 24px var(--shadow); }
   .rk-jenis-icon { width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
@@ -925,7 +925,7 @@
           <div class="rk-step-item"><div class="rk-step-num">2</div><span>Pilih Bulan &amp; Generate</span></div>
         </div>
       </div>
-      <div class="rk-three-col">
+      <div class="rk-three-col" style="grid-template-columns:200px 1fr 1fr;">
         <div class="rk-panel-gen">
           <div class="rk-panel-gen-title">Jenis Laporan</div>
           <div class="rk-lap-single" id="rkBlnLapList">
@@ -937,14 +937,7 @@
             <button class="rk-lap-btn" data-laporan="Laporan Kejadian Kriminal di Wilayah IKN" onclick="rkPilihLapBln_(this)"><div class="rk-lap-dot"></div><span class="rk-lap-nama">Laporan Kejadian Kriminal</span><span class="rk-lap-jml" id="rkBlnJml_kriminal">&mdash;</span></button>
           </div>
         </div>
-        <div class="rk-panel-gen">
-          <div class="rk-panel-gen-title">Breakdown Kategori <span style="font-weight:400;color:var(--text-tertiary);text-transform:none;letter-spacing:0;">(referensi)</span></div>
-          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:10px;" id="rkBlnTabelSub">Klik laporan di kiri untuk melihat breakdown kategorinya</div>
-          <div class="rk-tabel-bkd">
-            <table><thead><tr><th>Kategori</th><th>Jumlah</th><th>Proporsi</th></tr></thead>
-            <tbody id="rkBlnTbody"><tr><td colspan="3" style="text-align:center;color:var(--text-tertiary);padding:20px;font-size:12px;">Pilih laporan terlebih dahulu</td></tr></tbody></table>
-          </div>
-        </div>
+        <!-- Kolom tengah: Pilih Kategori -->
         <div class="rk-panel-gen">
           <div class="rk-panel-gen-title">Pilih Kategori <span style="font-weight:400;color:var(--text-tertiary);text-transform:none;letter-spacing:0;">(opsional)</span></div>
           <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:10px;">Kosong = semua kategori ikut</div>
@@ -955,6 +948,15 @@
             Lanjut Pilih Bulan
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
+        </div>
+        <!-- Kolom kanan: Tabel Breakdown (referensi) -->
+        <div class="rk-panel-gen">
+          <div class="rk-panel-gen-title">Breakdown Kategori <span style="font-weight:400;color:var(--text-tertiary);text-transform:none;letter-spacing:0;">(referensi)</span></div>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:10px;" id="rkBlnTabelSub">Klik laporan di kiri untuk melihat breakdown kategorinya</div>
+          <div class="rk-tabel-bkd">
+            <table><thead><tr><th>Kategori</th><th>Jumlah</th><th>Proporsi</th></tr></thead>
+            <tbody id="rkBlnTbody"><tr><td colspan="3" style="text-align:center;color:var(--text-tertiary);padding:20px;font-size:12px;">Pilih laporan terlebih dahulu</td></tr></tbody></table>
+          </div>
         </div>
       </div>
     </div>
@@ -1035,7 +1037,7 @@
         <div class="rk-stat-card"><div class="rk-stat-label">Kategori Dominan</div><div class="rk-stat-val" id="rkThnStatKategori">&mdash;</div></div>
         <div class="rk-stat-card"><div class="rk-stat-label">Bulan Teraktif</div><div class="rk-stat-val" id="rkThnStatBulan">&mdash;</div></div>
       </div>
-      <div class="rk-three-col" style="grid-template-columns:220px 1fr 280px;">
+      <div class="rk-three-col" style="grid-template-columns:200px 1fr 1fr;">
         <div class="rk-panel-gen">
           <div class="rk-panel-gen-title">Pilih Laporan</div>
           <div class="rk-lap-list" id="rkThnLapList">
@@ -1140,7 +1142,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwXDllv1JWIgatgxyrRp5byJWvo_5QzwVVfLCTb1uFF7kJDoZpW_9jGI1yBtQDqcxg/exec';
+    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwulAYyE8bKYDjLW72SYkTEfJHfIzavBq3ZNOWy3rCTmWSU_6saLsRoUwucAy-jdOuk/exec';
     let tokenSesi = localStorage.getItem('trantibum_token') || '';
     let peranSesi = localStorage.getItem('trantibum_peran') || '';
     let namaSesi = localStorage.getItem('trantibum_nama') || '';
@@ -1666,7 +1668,7 @@
       setTimeout(function() { chartBaru.resize(); }, 300);
       return chartBaru;
     }
-    /* ===== JS REALTIME ===== */
+    
     let dataRingkasanRealtime = null;
     let chartRealtime = null;
     let mapRealtimeInstance = null;
@@ -1969,8 +1971,7 @@
     }
     document.getElementById('filterTeksRealtime').addEventListener('input', renderTabelRealtime);
     document.getElementById('filterUnitRealtime').addEventListener('change', renderTabelRealtime);
-    /* ===== JS REKAP — MULTI-FLOW (Bulanan, Triwulanan, Tahunan) ===== */
-    /* Kategori tetap per jenis laporan — sumber utama daftar kategori di semua flow */
+
     const PETA_KATEGORI_LAPORAN = {
       'Laporan Kegiatan Rapat': ['Teknis', 'Non Teknis'],
       'Laporan Patroli Malam': ['Temuan', 'Tanpa Temuan'],
@@ -1987,14 +1988,14 @@
     };
     const RK_BULAN_URUT = ['Januari','Februari','Maret','April','Mei','Juni',
       'Juli','Agustus','September','Oktober','November','Desember'];
-    /* State TW */
+
     let rkTWKodeAktif = 'TW1';
     let rkTWDataCache = {};
-    /* State Bulanan */
+
     let rkBlnLapAktif = 'Laporan Kegiatan Rapat';
     let rkBlnKatTerpilih = [];
     let rkBlnBulanTerpilih = [];
-    /* State Tahunan */
+
     let rkThnDataCache = null;
 
     function bukaHalamanRekap() {
@@ -2013,7 +2014,7 @@
       if (id === 'rkSubThn') rkInitThn_();
     }
 
-    /* ════════════ TRIWULANAN ════════════ */
+
     function rkInitTW_() {
       ['TW1','TW2','TW3','TW4','Tahunan'].forEach(function(kode) {
         if (rkTWDataCache[kode]) {
@@ -2117,7 +2118,7 @@
       } catch(err) { sembunyikanSplash(); alert('Gagal memuat data: ' + err.message); }
     }
 
-    /* ════════════ BULANAN ════════════ */
+
     async function rkInitBln_() {
       if (!rkTWDataCache['Tahunan']) {
         try {
@@ -2138,7 +2139,7 @@
           if(el) el.textContent=(dataThn.perSumber&&dataThn.perSumber[e[0]])?dataThn.perSumber[e[0]]:'0';
         });
       }
-      /* Auto-pilih laporan pertama */
+
       const firstBtn = document.querySelector('#rkBlnLapList .rk-lap-btn');
       if (firstBtn) rkPilihLapBln_(firstBtn);
     }
@@ -2275,7 +2276,7 @@
       } catch(err) { sembunyikanSplash(); alert('Gagal memuat data: ' + err.message); }
     }
 
-    /* ════════════ TAHUNAN ════════════ */
+
     async function rkInitThn_() {
       document.getElementById('rkThnTahun').textContent = TAHUN_REKAP;
       document.getElementById('rkThnBtnLabel').textContent = TAHUN_REKAP;
@@ -2364,11 +2365,11 @@
       } catch(err) { sembunyikanSplash(); alert('Gagal memuat data: ' + err.message); }
     }
 
-    /* ────────── Helper ────────── */
+
     function rkSyncApiKey_(elId) {
       try { const k=localStorage.getItem('gemini_api_key'); if(k) document.getElementById(elId).value=k; } catch(e){}
     }
-    /* ===== JS GENERATE (BARU: checkbox kategori + periode bulanan) ===== */
+
     function ambilGeminiKey_() {
       const inputEl = document.getElementById('generateApiKey');
       const dariInput = inputEl ? inputEl.value.trim() : '';
@@ -2380,15 +2381,15 @@
     }
     let dataGenerateAktif = null;
     let kodeGenerateAktif = '';
-    let bulanListGenerate = [];  /* diisi dari rkBulanAktif saat bukaHalamanGenerate_ dipanggil */
+    let bulanListGenerate = [];  
     function bukaHalamanGenerate_(kode, data, bulanList, lapList, katList, apiKeyParam, penyusunParam, catatanParam, digest) {
       kodeGenerateAktif = kode;
       dataGenerateAktif = data;
       bulanListGenerate = bulanList || [];
-      /* Simpan params untuk Generate Ulang */
+
       window.__rkLastGenParam = { kode:kode, data:data, bulanList:bulanList, lapList:lapList, katList:katList, apiKeyParam:apiKeyParam, penyusunParam:penyusunParam, catatanParam:catatanParam };
       showView('viewGenerate');
-      /* Hitung judul laporan */
+
       let editorJudulTampil;
       if (kode === 'BULANAN' && (bulanList||[]).length) {
         const idxList = (bulanList||[]).map(function(b) { return RK_BULAN_URUT.indexOf(b); });
@@ -2402,13 +2403,13 @@
         editorJudulTampil = 'Laporan ' + kode.replace('TW','Triwulan ') + ' Tahun ' + TAHUN_REKAP;
       }
       document.getElementById('editorJudul').textContent = editorJudulTampil;
-      /* Langsung ke editor mode dengan loading state */
+
       document.getElementById('generateFormWrap').style.display = 'none';
       document.getElementById('generateEditorWrap').style.display = 'block';
       document.getElementById('generateEditor').textContent = 'AI sedang menyusun narasi laporan\u2026 Harap tunggu.';
-      /* Simpan API key jika ada */
+
       if (apiKeyParam) { try { localStorage.setItem('gemini_api_key', apiKeyParam); } catch(e){} }
-      /* Mulai generate langsung */
+
       tampilkanSplash('AI sedang menyusun narasi laporan\u2026');
       generateDenganGemini_(kode, data, digest||null, lapList||[], katList||[], bulanList||[], penyusunParam||'', catatanParam||'')
         .then(function(hasil) {
@@ -2433,7 +2434,7 @@
       return { dipilih: dipilih, semuaTerpilih: dipilih.length === semua.length };
     }
     document.getElementById('btnBackGenerate').addEventListener('click', function() {
-      showView('viewRekap'); /* sub-page aktif tersimpan, langsung kembali ke posisi terakhir */
+      showView('viewRekap');
     });
     document.getElementById('btnMulaiGenerate').addEventListener('click', async function() {
       if (!dataGenerateAktif) return;
@@ -2585,7 +2586,7 @@
       a.href = url; a.download = judulDoc.replace(/\s+/g, '_') + '.doc'; a.click();
       URL.revokeObjectURL(url);
     }
-    /* ===== JS SURAT (verbatim dari asli) ===== */
+
     let dataRingkasanSurat = null;
     let chartSurat = null;
     let stateDrillSurat = { sumber: null, kategori: null };
@@ -2884,12 +2885,12 @@
         btn.dataset.tipe
       );
     });
-    /* ===== FILTER URUTAN CHART ===== */
+
     document.getElementById('filterUrutanSurat').addEventListener('change', function() {
       urutanLegendaSuratAktif = this.value;
       renderChartSurat();
     });
-    /* ===== TEMA TERANG / GELAP ===== */
+
     const btnLight = document.getElementById('btnLight');
     const btnDark = document.getElementById('btnDark');
     function setTheme(theme) {
@@ -2900,7 +2901,7 @@
     }
     btnLight.addEventListener('click', function() { setTheme('light'); });
     btnDark.addEventListener('click', function() { setTheme('dark'); });
-    /* ===== INISIALISASI ===== */
+
     cobaSambungkanSesiOtomatis_();
   </script>
 </body>

@@ -2107,9 +2107,10 @@
       let html;
 
       if (rkKategoriFilter) {
-        /* Mode: filter by kategori — tampilkan per sumber untuk kategori ini */
+        /* Mode: tampilkan distribusi per sumber untuk kategori ini */
         const perSumberUntukKat = {};
         if (data.perKategoriPerSumber) {
+          /* API baru (sudah redeploy) — punya breakdown per sumber per kategori */
           Object.entries(data.perKategoriPerSumber).forEach(function(e) {
             const sumber = e[0];
             const perKat = e[1];
@@ -2117,6 +2118,13 @@
               perSumberUntukKat[sumber] = perKat[rkKategoriFilter];
             }
           });
+        } else {
+          /* API lama (belum redeploy) — fallback: pakai total per kategori, 
+             gunakan sumber aktif (atau "Semua Sumber") sebagai label baris */
+          const countKat = data.perKategori && data.perKategori[rkKategoriFilter];
+          if (countKat) {
+            perSumberUntukKat[rkSumberFilter || 'Semua Sumber'] = countKat;
+          }
         }
         const entri = Object.entries(perSumberUntukKat).sort(function(a,b){ return b[1]-a[1]; });
         const katTotal = entri.reduce(function(s,e){ return s+e[1]; }, 0);
@@ -2126,6 +2134,9 @@
           const p = katTotal > 0 ? ((e[1]/katTotal)*100).toFixed(1) : 0;
           return '<tr><td>' + escapeHtml(e[0]) + '</td><td><strong>' + e[1] + '</strong></td><td>' + p + '%</td></tr>';
         }).join('');
+        if (!data.perKategoriPerSumber && entri.length > 0) {
+          html += '<tr><td colspan="3" style="font-size:11px;color:var(--text-tertiary);padding:6px 14px;border-bottom:none;">Rincian detail per sumber tersedia setelah Apps Script diperbarui</td></tr>';
+        }
       } else if (rkSumberFilter && data.perKategoriPerSumber && data.perKategoriPerSumber[rkSumberFilter]) {
         const perKat = data.perKategoriPerSumber[rkSumberFilter];
         const entri = Object.entries(perKat).filter(function(e){ return e[1]>0; }).sort(function(a,b){ return b[1]-a[1]; });
@@ -2317,7 +2328,7 @@
       const grid = document.getElementById('generateStatGrid');
       grid.innerHTML = [
         { label: 'Total Kegiatan', val: (data.total || 0).toLocaleString('id-ID') },
-        { label: 'Sumber Terbanyak', val: sumberEntri.length ? singkatNamaSumber_(sumberEntri[0][0]) : '\u2014' },
+        { label: 'Sumber Terbanyak', val: sumberEntri.length ? sumberEntri[0][0].replace('Laporan Kegiatan ','').replace('Laporan ','') : '\u2014' },
         { label: 'Periode', val: periodeStr },
         { label: 'Sumber Data', val: Object.keys(data.perSumber || {}).length + ' jenis laporan' }
       ].map(function(item) {
@@ -2326,7 +2337,7 @@
       /* Grid sumber checkbox */
       const gridSumber = document.getElementById('generateSumberGrid');
       gridSumber.innerHTML = sumberEntri.map(function(e) {
-        return '<label class="cek-sumber terpilih"><input type="checkbox" value="' + escapeHtml(e[0]) + '" checked><span class="cek-sumber-nama">' + escapeHtml(singkatNamaSumber_(e[0])) + '</span><span class="cek-sumber-jumlah">' + e[1] + '</span></label>';
+        return '<label class="cek-sumber terpilih"><input type="checkbox" value="' + escapeHtml(e[0]) + '" checked><span class="cek-sumber-nama">' + escapeHtml(e[0].replace('Laporan Kegiatan ','').replace('Laporan ','')) + '</span><span class="cek-sumber-jumlah">' + e[1] + '</span></label>';
       }).join('');
       gridSumber.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
         cb.addEventListener('change', function() { this.closest('.cek-sumber').classList.toggle('terpilih', this.checked); });

@@ -473,10 +473,142 @@
   
   .rk-btn-lanjut { width:100%; background:var(--accent-pelaporan-deep); color:#fff; border:none; border-radius:10px; padding:11px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; transition:opacity .2s; margin-top:10px; }
   .rk-btn-lanjut:hover { opacity:.88; }
-  .rk-btn-gen { width:100%; background:var(--accent-pelaporan-deep); color:#fff; border:none; border-radius:11px; padding:13px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; transition:opacity .2s, background .25s; }
+  .rk-btn-gen { width:100%; background:var(--accent-pelaporan-deep); color:#fff; border:none; border-radius:11px; padding:13px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:8px; transition:opacity .2s, background .25s, transform .12s; }
   .rk-btn-gen:hover { opacity:.88; }
+  .rk-btn-gen:active { transform:scale(.97); }
   .rk-btn-gen.per-kategori { background:var(--accent-warn); }
-</style>
+
+  /* ══ ANIMASI ══ */
+  @keyframes rkFadeSlide {
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes rkFadeIn {
+    from { opacity:0; }
+    to   { opacity:1; }
+  }
+  @keyframes rkPop {
+    0%   { transform:scale(.94); opacity:0; }
+    60%  { transform:scale(1.02); }
+    100% { transform:scale(1);   opacity:1; }
+  }
+  @keyframes rkSlideRight {
+    from { opacity:0; transform:translateX(-12px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  @keyframes rkChipPulse {
+    0%   { transform:scale(1); }
+    40%  { transform:scale(1.06); }
+    100% { transform:scale(1); }
+  }
+  @keyframes splashPulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%     { opacity:.75; transform:scale(.95); }
+  }
+  @keyframes splashDot {
+    0%,80%,100% { transform:translateY(0); opacity:.4; }
+    40%         { transform:translateY(-8px); opacity:1; }
+  }
+  .rk-subpage.aktif { animation:rkFadeSlide .28s cubic-bezier(.22,.68,0,1.1) both; }
+  .rk-jenis-card { transition:border-color .2s, transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s; }
+  .rk-jenis-card:active { transform:scale(.97) !important; }
+  .rk-tw-btn { transition:border-color .18s, background .18s, transform .14s; }
+  .rk-tw-btn:active { transform:scale(.96); }
+  .rk-lap-btn { transition:border-color .18s, background .18s, transform .18s; }
+  .rk-lap-item { transition:border-color .18s, background .18s; }
+  .rk-kat-item { transition:border-color .18s, background .18s, transform .12s; }
+  .rk-kat-item:active { transform:scale(.98); }
+  .rk-bulan-chip { transition:background .18s, border-color .18s, color .18s, transform .14s, box-shadow .18s; }
+  .rk-bulan-chip:active { transform:scale(.94); }
+  .rk-bulan-chip.terpilih { animation:rkChipPulse .22s ease; box-shadow:0 2px 8px color-mix(in srgb, var(--accent-pelaporan-deep) 30%, transparent); }
+  .rk-btn-lanjut { transition:opacity .2s, transform .14s; }
+  .rk-btn-lanjut:active { transform:scale(.97); }
+  .rk-panel-gen { transition:box-shadow .2s; }
+  .rk-panel-gen:focus-within { box-shadow:0 0 0 2px color-mix(in srgb, var(--accent-pelaporan) 30%, transparent); }
+  .rk-stat-card { animation:rkFadeIn .35s ease both; }
+  .rk-stat-card:nth-child(1) { animation-delay:.05s; }
+  .rk-stat-card:nth-child(2) { animation-delay:.10s; }
+  .rk-stat-card:nth-child(3) { animation-delay:.15s; }
+  .rk-stat-card:nth-child(4) { animation-delay:.20s; }
+  .rk-lap-btn:nth-child(1) { animation:rkSlideRight .22s .04s ease both; }
+  .rk-lap-btn:nth-child(2) { animation:rkSlideRight .22s .08s ease both; }
+  .rk-lap-btn:nth-child(3) { animation:rkSlideRight .22s .12s ease both; }
+  .rk-lap-btn:nth-child(4) { animation:rkSlideRight .22s .16s ease both; }
+  .rk-lap-btn:nth-child(5) { animation:rkSlideRight .22s .20s ease both; }
+  .rk-lap-btn:nth-child(6) { animation:rkSlideRight .22s .24s ease both; }
+  @media (prefers-reduced-motion:reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+
+  /* ══ BULAN CHIP — lebih besar dan nyaman ══ */
+  .rk-bulan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+  .rk-bulan-chip { padding:14px 8px; font-size:13px; font-weight:600; border-radius:11px; }
+  .rk-bulan-actions { gap:8px; margin-bottom:12px; }
+  .rk-bulan-aksi { padding:10px; font-size:12px; border-radius:9px; }
+
+  /* ══ RESPONSIF TABLET (≤ 1100px) ══ */
+  @media (max-width:1100px) {
+    .rk-three-col { grid-template-columns:1fr 1fr !important; }
+    .rk-three-col > *:last-child { grid-column:1 / -1; }
+  }
+
+  /* ══ RESPONSIF TABLET KECIL (≤ 860px) ══ */
+  @media (max-width:860px) {
+    .rk-subpage { padding:18px 20px 32px; gap:14px; }
+    .rk-jenis-grid { grid-template-columns:1fr 1fr !important; gap:14px; }
+    .rk-two-col { grid-template-columns:1fr !important; }
+    .rk-three-col { grid-template-columns:1fr !important; }
+    .rk-three-col > *:last-child { grid-column:1; }
+    .rk-stat-grid { grid-template-columns:repeat(2,1fr); }
+    .rk-tw-grid { grid-template-columns:repeat(3,1fr); }
+    .rk-sel-badges { gap:6px; }
+  }
+
+  /* ══ RESPONSIF MOBILE (≤ 540px) ══ */
+  @media (max-width:540px) {
+    .rk-subpage { padding:14px 14px 28px; gap:12px; }
+    .rk-flow-title { font-size:18px; }
+    .rk-flow-sub { font-size:12px; }
+    .rk-jenis-grid { grid-template-columns:1fr !important; gap:10px; }
+    .rk-jenis-card { padding:20px 16px; }
+    .rk-jenis-name { font-size:17px; }
+    .rk-stat-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+    .rk-stat-val { font-size:15px; }
+    .rk-tw-grid { grid-template-columns:repeat(3,1fr); gap:7px; }
+    .rk-tw-btn { padding:10px 6px; }
+    .rk-tw-kode { font-size:12px; }
+    .rk-tw-bulan { font-size:10px; }
+    .rk-lap-btn { padding:10px 10px; }
+    .rk-lap-nama { font-size:11px; }
+    .rk-bulan-grid { grid-template-columns:repeat(3,1fr); gap:7px; }
+    .rk-bulan-chip { padding:12px 6px; font-size:12px; }
+    .rk-step-bar { gap:0; flex-wrap:wrap; }
+    .rk-step-sep { width:16px; }
+    .rk-step-item span { font-size:11px; }
+    .rk-panel-gen { padding:14px; }
+    .rk-btn-gen { font-size:13px; padding:12px; }
+    .rk-sel-badge { font-size:10px; padding:4px 10px; }
+  }
+
+  /* ══ RESPONSIF GAYA UMUM ══ */
+  @media (max-width:860px) {
+    .mode-cards { grid-template-columns:1fr !important; max-width:340px !important; }
+    .landing-title { font-size:var(--fs-title1); }
+    .rekap-stat-grid { grid-template-columns:repeat(2,1fr); }
+    .side-by-side { grid-template-columns:1fr; }
+  }
+  @media (max-width:540px) {
+    .app-header { padding:10px 14px; min-height:52px; }
+    .header-text-title { font-size:13px; }
+    .header-text-eyebrow { display:none; }
+    .header-user-nama { display:none; }
+    .view { padding:14px 14px 28px; }
+    .panel-chart { padding:16px; }
+    .chart-body { flex-direction:column; }
+    .chart-canvas-wrap { width:260px; height:260px; max-width:100%; }
+    .chart-legend { width:100%; }
+    .rk-form-field input, .rk-form-field textarea { font-size:16px; }
+  }
 </style>
 </head>
 <body data-theme="light">
@@ -977,7 +1109,7 @@
       <div class="rk-sel-badges" id="rkBlnBadges">
         <span style="font-size:12px;color:var(--text-secondary);font-weight:600;">Pilihan:</span>
       </div>
-      <div class="rk-two-col">
+      <div class="rk-two-col" style="grid-template-columns:minmax(280px,420px) 1fr;">
         <div class="rk-panel-gen">
           <div class="rk-panel-gen-title">Pilih Bulan</div>
           <div class="rk-bulan-grid">

@@ -1348,7 +1348,7 @@
       btn.disabled = true; btn.textContent = 'Memeriksa\u2026'; errEl.textContent = '';
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=login&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message || 'Login gagal.');
         tokenSesi = json.token; peranSesi = json.peran; namaSesi = json.nama;
         rememberTokenSesi = json.rememberToken || '';
@@ -1379,7 +1379,7 @@
         tampilkanSplash('Memeriksa sesi tersimpan\u2026');
         try {
           const resp = await fetch(API_BASE_URL + '?fungsi=loginDenganRememberToken&rememberToken=' + encodeURIComponent(rememberTokenSesi));
-          const json = await resp.json();
+          const json = await safeJson_(resp);
           if (json.status === 'success') {
             tokenSesi = json.token; peranSesi = json.peran; namaSesi = json.nama;
             localStorage.setItem('trantibum_token', tokenSesi);
@@ -1555,7 +1555,7 @@
       tampilkanSplash('Memuat data Pelaporan\u2026');
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanPelaporan');
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat data');
         dataRingkasanPelaporan = json.data;
         stateDrillPelaporan = { sumber: null, kategori: null, subKategori: null };
@@ -1693,7 +1693,7 @@
       const params = new URLSearchParams({ fungsi: 'detailPelaporan', sumber: stateDrillPelaporan.sumber, kategori: stateDrillPelaporan.kategori, subKategori: stateDrillPelaporan.subKategori });
       try {
         const resp = await fetch(API_BASE_URL + '?' + params.toString());
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat detail');
         dataTabelPelaporanMentah = json.data.slice().sort(function(a, b) {
           return parseWaktuPelaporanFE_(b['Waktu Pelaksanaan'], b['Bulan']) - parseWaktuPelaporanFE_(a['Waktu Pelaksanaan'], a['Bulan']);
@@ -1762,7 +1762,7 @@
     async function muatTrenBulananPelaporan() {
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=trenBulananPelaporan');
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message);
         dataTrenPelaporan = json;
         const tipeAktif = (document.querySelector('#toggleGrafikPelaporan .toggle-grafik-btn.active') || {}).dataset || { tipe: 'bar' };
@@ -1828,7 +1828,7 @@
         const elTarget = document.getElementById(idTarget);
         try {
           const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanRealtime&bidang=' + encodeURIComponent(bidang));
-          const json = await resp.json();
+          const json = await safeJson_(resp);
           if (json.status !== 'success') throw new Error(json.message);
           const total = Object.values(json.data).reduce(function(a, b) { return a + b; }, 0);
           elTarget.textContent = total + ' laporan tercatat';
@@ -1858,7 +1858,7 @@
       document.getElementById('judulChartRealtime').textContent = 'Memuat data\u2026';
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanRealtime&bidang=' + encodeURIComponent(bidangRealtimeAktif));
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat data');
         dataRingkasanRealtime = json.data;
         stateDrillRealtime = { jenis: null };
@@ -1959,7 +1959,7 @@
       layerMarkerRealtimeGabungan.clearLayers();
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=detailRealtimeGabungan');
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message);
         const penanda = {}; const kategoriTerlihat = {}; let jumlahTitik = 0;
         json.data.forEach(function(row) {
@@ -2004,7 +2004,7 @@
       if (jenisFilter) params.set('jenis', jenisFilter);
       try {
         const resp = await fetch(API_BASE_URL + '?' + params.toString());
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message);
         const penanda = {}; const kategoriTerlihat = {};
         if (!jenisFilter) {
@@ -2050,7 +2050,7 @@
       const params = new URLSearchParams({ fungsi: 'detailRealtime', jenis: stateDrillRealtime.jenis, bidang: bidangRealtimeAktif });
       try {
         const resp = await fetch(API_BASE_URL + '?' + params.toString());
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat detail');
         dataTabelRealtimeMentah = json.data.slice().sort(function(a, b) { return parseTimestampRealtime_(b['Timestamp']) - parseTimestampRealtime_(a['Timestamp']); });
         isiOpsiUnitRealtime(dataTabelRealtimeMentah);
@@ -2201,7 +2201,7 @@
       tampilkanSplash('Memuat data ' + labelKode + '\u2026');
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanTriwulan&tw=' + kode + '&tahun=' + TAHUN_REKAP);
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message);
         rkTWDataCache[kode] = json;
         rkRenderTWStat_(json);
@@ -2255,7 +2255,7 @@
       if (!rkTWDataCache['Tahunan']) {
         try {
           const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanTriwulan&tw=Tahunan&tahun=' + TAHUN_REKAP);
-          const json = await resp.json();
+          const json = await safeJson_(resp);
           if (json.status === 'success') { rkTWDataCache['Tahunan']=json; rkThnDataCache=json; }
         } catch(e) {}
       }
@@ -2399,9 +2399,9 @@
           fetch(API_BASE_URL + '?fungsi=ringkasanTriwulan&tw=BULANAN&tahun=' + TAHUN_REKAP + paramBulan + paramSumber + paramKat),
           fetch(API_BASE_URL + '?fungsi=digestTriwulan&tw=BULANAN&tahun=' + TAHUN_REKAP + paramBulan + paramSumber + paramKat)
         ]);
-        const dataR = await respR.json();
+        const dataR = await safeJson_(respR);
         if (dataR.status !== 'success') throw new Error(dataR.message);
-        const dataD = await respD.json();
+        const dataD = await safeJson_(respD);
         const digest = dataD.status==='success' ? dataD.digest : null;
         sembunyikanSplash();
         bukaHalamanGenerate_('BULANAN', dataR, rkBlnBulanTerpilih.slice(), [rkBlnLapAktif], rkBlnKatTerpilih.slice(), apiKey, penyusun, catatan, digest);
@@ -2417,7 +2417,7 @@
       tampilkanSplash('Memuat data tahunan\u2026');
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=ringkasanTriwulan&tw=Tahunan&tahun=' + TAHUN_REKAP);
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message);
         rkThnDataCache = json;
         rkTWDataCache['Tahunan'] = json;
@@ -2489,8 +2489,8 @@
           fetch(API_BASE_URL + '?fungsi=digestTriwulan&tw=Tahunan&tahun=' + TAHUN_REKAP + paramSumber + paramKat)
         ]);
         let data = rkThnDataCache || {};
-        if (respR) { const j=await respR.json(); if(j.status==='success') data=j; }
-        const dj = await respD.json();
+        if (respR) { const j=await safeJson_(respR); if(j.status==='success') data=j; }
+        const dj = await safeJson_(respD);
         const digest = dj.status==='success' ? dj.digest : null;
         sembunyikanSplash();
         bukaHalamanGenerate_('Tahunan', data, [], lapDipilih, katDipilih, apiKey, penyusun, catatan, digest);
@@ -2500,6 +2500,22 @@
     /* ────────── Helper ────────── */
     function rkSyncApiKey_(elId) {
       try { const k=localStorage.getItem('gemini_api_key'); if(k) document.getElementById(elId).value=k; } catch(e){}
+    }
+
+    async function safeJson_(resp) {
+      const teks = await resp.text();
+      try {
+        return JSON.parse(teks);
+      } catch(e) {
+        if (teks.includes('<!DOCTYPE') || teks.includes('<html')) {
+          console.error('[Apps Script HTML Error]', teks.substring(0, 500));
+          throw new Error('Apps Script mengembalikan halaman HTML (bukan JSON). Kemungkinan penyebab:\n' +
+            '1. Sesi login kedaluwarsa — coba keluar dan login ulang.\n' +
+            '2. Apps Script error — buka Apps Script > Eksekusi untuk melihat detail error.\n' +
+            '3. Deployment belum aktif — pastikan sudah New Deployment dengan akses "Anyone".');
+        }
+        throw new Error('Response bukan JSON valid. Preview: ' + teks.substring(0, 120));
+      }
     }
     /* ===== JS GENERATE (BARU: checkbox kategori + periode bulanan) ===== */
     function ambilGeminiKey_() {
@@ -2695,7 +2711,7 @@
         if (resp.status === 400 || resp.status === 403) pesanErr += ' \u2014 Periksa apakah API key benar dan aktif di aistudio.google.com';
         throw new Error(pesanErr);
       }
-      const json = await resp.json();
+      const json = await safeJson_(resp);
       const teks = json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text;
       if (!teks) throw new Error('Respons AI kosong atau tidak valid.');
       return teks;
@@ -2913,7 +2929,7 @@
       });
       try {
         const resp = await fetch(API_BASE_URL + '?' + params.toString());
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat detail');
         dataTabelSuratMentah = json.data.slice().sort(function(a, b) {
           return parseTimestampRealtime_(b['Timestamp Agregasi'] || '') - parseTimestampRealtime_(a['Timestamp Agregasi'] || '');
@@ -2993,7 +3009,7 @@
     async function muatTrenBulananSurat() {
       try {
         const resp = await fetch(API_BASE_URL + '?fungsi=trenBulananSurat');
-        const json = await resp.json();
+        const json = await safeJson_(resp);
         if (json.status !== 'success') throw new Error(json.message);
         dataTrenSurat = json;
         const tipeAktifSurat = (document.querySelector('#toggleGrafikSurat .toggle-grafik-btn.active') || {}).dataset || { tipe: 'bar' };

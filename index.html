@@ -478,7 +478,7 @@
   .rk-btn-gen:active { transform:scale(.97); }
   .rk-btn-gen.per-kategori { background:var(--accent-warn); }
 
-  /* ══ ANIMASI ══ */
+  
   @keyframes rkFadeSlide {
     from { opacity:0; transform:translateY(14px); }
     to   { opacity:1; transform:translateY(0); }
@@ -540,19 +540,19 @@
     *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
   }
 
-  /* ══ BULAN CHIP — lebih besar dan nyaman ══ */
+  
   .rk-bulan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
   .rk-bulan-chip { padding:14px 8px; font-size:13px; font-weight:600; border-radius:11px; }
   .rk-bulan-actions { gap:8px; margin-bottom:12px; }
   .rk-bulan-aksi { padding:10px; font-size:12px; border-radius:9px; }
 
-  /* ══ RESPONSIF TABLET (≤ 1100px) ══ */
+  
   @media (max-width:1100px) {
     .rk-three-col { grid-template-columns:1fr 1fr !important; }
     .rk-three-col > *:last-child { grid-column:1 / -1; }
   }
 
-  /* ══ RESPONSIF TABLET KECIL (≤ 860px) ══ */
+  
   @media (max-width:860px) {
     .rk-subpage { padding:18px 20px 32px; gap:14px; }
     .rk-jenis-grid { grid-template-columns:1fr 1fr !important; gap:14px; }
@@ -564,7 +564,7 @@
     .rk-sel-badges { gap:6px; }
   }
 
-  /* ══ RESPONSIF MOBILE (≤ 540px) ══ */
+  
   @media (max-width:540px) {
     .rk-subpage { padding:14px 14px 28px; gap:12px; }
     .rk-flow-title { font-size:18px; }
@@ -590,7 +590,7 @@
     .rk-sel-badge { font-size:10px; padding:4px 10px; }
   }
 
-  /* ══ RESPONSIF GAYA UMUM ══ */
+  
   @media (max-width:860px) {
     .mode-cards { grid-template-columns:1fr !important; max-width:340px !important; }
     .landing-title { font-size:var(--fs-title1); }
@@ -1273,7 +1273,7 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
 
-    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxSsL4s9HUgj1F4ddXsnsmgsjzTCZieqrWQ9j22khOy3yf0PDs2byxlpE-Egw_vYxCY/exec';
+    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyj-BdQSyg1gHit1YzDwyaxfokM0tDVMgyAU4Be9GPB_4SkrJskiAHxpgrEh4jT-bWq/exec';
     let tokenSesi = localStorage.getItem('trantibum_token') || '';
     let peranSesi = localStorage.getItem('trantibum_peran') || '';
     let namaSesi = localStorage.getItem('trantibum_nama') || '';
@@ -3073,6 +3073,7 @@
     btnDark.addEventListener('click', function() { setTheme('dark'); });
     /* ===== INISIALISASI ===== */
     cobaSambungkanSesiOtomatis_();
+  
   
   </script>
 </body>

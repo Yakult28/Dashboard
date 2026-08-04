@@ -2299,17 +2299,25 @@
       }
       let entri;
       if (perKat) {
-        entri = daftarKat.map(function(k){return [k, perKat[k]||0];}).filter(function(e){return e[1]>0;}).sort(function(a,b){return b[1]-a[1];});
+        entri = daftarKat
+          .map(function(k){ return [k, perKat[k] || 0]; })
+          .sort(function(a,b){ return b[1] - a[1]; });
       } else {
-        entri = daftarKat.map(function(k){return [k, null];});
+        entri = daftarKat.map(function(k){ return [k, null]; });
       }
-      const max = entri.length && entri[0][1] ? entri[0][1] : 1;
-      const total = entri.reduce(function(s,e){return s+(e[1]||0);}, 0);
+      const total = perKat ? entri.reduce(function(s,e){ return s + e[1]; }, 0) : 0;
+      const max   = entri.length && entri[0][1] ? entri[0][1] : 1;
       tbody.innerHTML = entri.map(function(e) {
-        if (e[1] === null) return '<tr><td>' + escapeHtml(e[0]) + '</td><td style="color:var(--text-tertiary)">—</td><td style="color:var(--text-tertiary)">—</td></tr>';
-        const pct = total>0 ? ((e[1]/total)*100).toFixed(1) : 0;
-        const w = max>0 ? Math.round((e[1]/max)*100) : 0;
-        return '<tr><td>' + escapeHtml(e[0]) + '</td><td><strong>' + e[1] + '</strong></td><td>' + pct + '%<div class="rk-bar-wrap"><div class="rk-bar-fill" style="width:' + w + '%"></div></div></td></tr>';
+        if (e[1] === null) {
+          return '<tr><td>' + escapeHtml(e[0]) + '</td><td style="color:var(--text-tertiary)">—</td><td style="color:var(--text-tertiary)">—</td></tr>';
+        }
+        if (e[1] === 0) {
+          return '<tr style="opacity:.45"><td>' + escapeHtml(e[0]) + '</td><td style="color:var(--text-tertiary)">0</td><td style="color:var(--text-tertiary)">0%</td></tr>';
+        }
+        const pct = total > 0 ? ((e[1]/total)*100).toFixed(1) : 0;
+        const w   = max > 0   ? Math.round((e[1]/max)*100)    : 0;
+        return '<tr><td>' + escapeHtml(e[0]) + '</td><td><strong>' + e[1] + '</strong></td>' +
+          '<td>' + pct + '%<div class="rk-bar-wrap"><div class="rk-bar-fill" style="width:' + w + '%"></div></div></td></tr>';
       }).join('');
     }
 
